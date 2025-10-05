@@ -6,23 +6,85 @@
   <title>Market Arabası Takip Sistemi</title>
   <style>
     body { font-family: Arial; margin: 0; padding: 0; background: #f0f0f0; }
-    header { background: #007bff; color: white; text-align: center; padding: 1rem; }
-    main { display: flex; justify-content: center; padding: 2rem; gap: 2rem; }
-    #store-map { position: relative; width: 800px; height: 500px; border: 2px solid #ccc; background-color: #fff; }
-    .cart { position: absolute; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-    #controls { display: flex; flex-direction: column; gap: 1rem; }
-    button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+  header { background: #ff9800; color: white; text-align: center; padding: 1rem; }
+    main {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0;
+      gap: 2rem;
+      height: calc(100vh - 70px);
+      min-height: 600px;
+    }
+    #store-map {
+      position: relative;
+      width: 600px;
+      height: calc(100vh - 70px);
+      min-height: 600px;
+      border: 2px solid #ccc;
+      background-color: #fff;
+      margin-top: 0;
+      margin-left: 0;
+      box-sizing: border-box;
+    }
+    .cart {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .shelf {
+      position: absolute;
+      background: #ffe0b2;
+      border: 2px solid #ff9800;
+      border-radius: 8px;
+      z-index: 1;
+    }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #fff3e0;
+      border: 2px solid #ff9800;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+      min-width: 220px;
+      align-items: stretch;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    button {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #ff9800;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #fb8c00;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Market Arabası Takip Sistemi</h1>
+  <h1>ORAN MİGROS TAKİP SİSTEMİ</h1>
   </header>
   <main>
     <div id="store-map"></div>
     <div id="controls">
-      <button id="connect-btn">BLE Cihazına Bağlan</button>
-      <button id="toggle-sim">Simülasyonu Aç/Kapa</button>
+  <button id="connect-btn">BLE Cihazına Bağlan</button>
+  <button id="toggle-sim">Takibi Aç/Kapa</button>
+  <button id="toggle-heatmap">Isı Haritasını Göster</button>
     </div>
   </main>
 
@@ -31,13 +93,27 @@
     const storeMap = document.getElementById('store-map');
 
     // Arabalar ve konumları
-    let carts = [
-      { id: 1, x: 50, y: 100 },
-      { id: 2, x: 200, y: 150 },
-      { id: 3, x: 400, y: 300 },
+    // Reyonlar (örnek: x, y, genişlik, yükseklik)
+    const shelves = [
+      { x: 60, y: 60, w: 120, h: 30 },
+      { x: 60, y: 120, w: 120, h: 30 },
+      { x: 220, y: 60, w: 120, h: 30 },
+      { x: 220, y: 120, w: 120, h: 30 },
+      { x: 400, y: 60, w: 150, h: 30 },
+      { x: 400, y: 120, w: 150, h: 30 },
+      { x: 60, y: 220, w: 490, h: 30 },
+      { x: 60, y: 320, w: 490, h: 30 },
+      { x: 60, y: 420, w: 490, h: 30 },
     ];
 
-    let simulation = true;
+    let carts = [
+      { id: 1, x: 80, y: 70 },
+      { id: 2, x: 250, y: 130 },
+      { id: 3, x: 420, y: 70 },
+    ];
+
+  let simulation = true;
+  let heatmapVisible = true;
 
     // Heatmap ayarları
     const heatmap = h337.create({
@@ -50,6 +126,17 @@
 
     function renderCarts() {
       storeMap.innerHTML = '';
+      // Reyonları çiz
+      shelves.forEach(shelf => {
+        const shelfEl = document.createElement('div');
+        shelfEl.classList.add('shelf');
+        shelfEl.style.left = shelf.x + 'px';
+        shelfEl.style.top = shelf.y + 'px';
+        shelfEl.style.width = shelf.w + 'px';
+        shelfEl.style.height = shelf.h + 'px';
+        storeMap.appendChild(shelfEl);
+      });
+      // Arabaları çiz
       carts.forEach(cart => {
         const cartEl = document.createElement('div');
         cartEl.classList.add('cart');
@@ -60,10 +147,15 @@
         storeMap.appendChild(cartEl);
       });
       // Heatmap güncelle
-      heatmap.setData({
-        max: 10,
-        data: carts.map(c => ({ x: c.x + 20, y: c.y + 20, value: 5 }))
-      });
+      if (heatmapVisible) {
+        heatmap.setData({
+          max: 10,
+          data: carts.map(c => ({ x: c.x + 20, y: c.y + 20, value: 5 }))
+        });
+        heatmap._renderer.canvas.style.display = '';
+      } else {
+        heatmap._renderer.canvas.style.display = 'none';
+      }
     }
 
     renderCarts();
@@ -71,10 +163,10 @@
     function moveCarts() {
       if(!simulation) return;
       carts.forEach(cart => {
-        cart.x += Math.floor(Math.random() * 11 - 5);
-        cart.y += Math.floor(Math.random() * 11 - 5);
-        cart.x = Math.max(0, Math.min(760, cart.x));
-        cart.y = Math.max(0, Math.min(460, cart.y));
+  cart.x += Math.floor(Math.random() * 11 - 5);
+  cart.y += Math.floor(Math.random() * 11 - 5);
+  cart.x = Math.max(0, Math.min(560, cart.x));
+  cart.y = Math.max(0, Math.min(storeMap.offsetHeight - 40, cart.y));
       });
       renderCarts();
     }
@@ -84,6 +176,13 @@
     // Simülasyonu aç/kapa
     document.getElementById('toggle-sim').addEventListener('click', () => {
       simulation = !simulation;
+    });
+
+    // Isı haritası göster/gizle
+    document.getElementById('toggle-heatmap').addEventListener('click', () => {
+      heatmapVisible = !heatmapVisible;
+      renderCarts();
+      document.getElementById('toggle-heatmap').textContent = heatmapVisible ? 'Isı Haritasını Gizle' : 'Isı Haritasını Göster';
     });
 
     // BLE cihazına bağlan (Web Bluetooth API simülasyonu)
