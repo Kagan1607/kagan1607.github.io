@@ -19,7 +19,7 @@
     }
     #store-map {
       position: relative;
-      width: 1200px;
+      width: 1400px;
       height: calc(100vh - 70px);
       min-height: 600px;
       border: 2px solid #ccc;
@@ -78,7 +78,9 @@
 <body>
   <header>
     <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Migros_logo.svg" alt="Migros Logo" style="height: 54px; background: transparent;">
+      <svg width="260" height="60" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">MiGROS</text>
+      </svg>
       <span style="font-size: 2.1rem; font-weight: bold; letter-spacing: 1px; color: #fff;">MARKET ARABASI TAKİP SİSTEMİ</span>
     </div>
   </header>
@@ -168,7 +170,7 @@
       carts.forEach(cart => {
   cart.x += Math.floor(Math.random() * 11 - 5);
   cart.y += Math.floor(Math.random() * 11 - 5);
-  cart.x = Math.max(0, Math.min(1160, cart.x));
+  cart.x = Math.max(0, Math.min(1360, cart.x));
   cart.y = Math.max(0, Math.min(storeMap.offsetHeight - 40, cart.y));
       });
       renderCarts();
