@@ -73,6 +73,46 @@
     button:hover {
       background: #d65d0e;
     }
+    #cart-list-panel {
+      background: #fff3e0;
+      border: 2px solid #ee7624;
+      border-radius: 12px;
+      min-width: 220px;
+      max-width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      height: 500px;
+    }
+    .cart-list-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ee7624;
+      background: #fff;
+      border-radius: 12px 12px 0 0;
+      padding: 1rem 1rem 0.7rem 1rem;
+      text-align: center;
+      border-bottom: 1.5px solid #ee7624;
+    }
+    .cart-list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.7rem 1rem 1rem 1rem;
+      background: #fff3e0;
+      border-radius: 0 0 12px 12px;
+    }
+    .cart-list-item {
+      font-size: 1rem;
+      color: #333;
+      background: #fff;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid #ee7624;
+      font-weight: 500;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
   </style>
 </head>
 <body>
@@ -86,10 +126,16 @@
   </header>
   <main>
     <div id="store-map"></div>
-    <div id="controls">
-  <button id="connect-btn">BLE Cihazına Bağlan</button>
-  <button id="toggle-sim">Takibi Aç/Kapa</button>
-  <button id="toggle-heatmap">Isı Haritasını Göster</button>
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div id="controls">
+        <button id="connect-btn">BLE Cihazına Bağlan</button>
+        <button id="toggle-sim">Takibi Aç/Kapa</button>
+        <button id="toggle-heatmap">Isı Haritasını Göster</button>
+      </div>
+      <div id="cart-list-panel">
+        <div class="cart-list-title">Takip Edilen Market Arabaları</div>
+        <div class="cart-list-scroll"></div>
+      </div>
     </div>
   </main>
 
@@ -203,6 +249,15 @@
         alert('BLE bağlantısı başarısız: ' + error);
       }
     });
+
+    // Takip edilen market arabaları listesini doldur
+    const cartListScroll = document.querySelector('.cart-list-scroll');
+    for(let i=1; i<=50; i++) {
+      const item = document.createElement('div');
+      item.className = 'cart-list-item';
+      item.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+      cartListScroll.appendChild(item);
+    }
   </script>
 </body>
 </html>
