@@ -371,7 +371,7 @@
     for(let i=1; i<=cartCount; i++) {
       const item = document.createElement('div');
       item.className = 'cart-list-item';
-      // Bağlantı ikonu
+      // Sol bağlantı ikonu (küçük daire)
       const icon = document.createElement('span');
       icon.className = 'cart-status-icon disconnected';
       icon.title = 'Bağlı değil';
@@ -380,6 +380,12 @@
       const label = document.createElement('span');
       label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
       item.appendChild(label);
+      // Sağ zincir iconu (SVG olarak)
+      const chain = document.createElement('span');
+      chain.className = 'cart-chain-icon disconnected';
+      chain.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.657 6.343a6 6 0 0 1 0 8.485l-3.535 3.535a6 6 0 0 1-8.485-8.485l1.414-1.414" stroke="#f44336" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.343 17.657a6 6 0 0 1 0-8.485l3.535-3.535a6 6 0 0 1 8.485 8.485l-1.414 1.414" stroke="#f44336" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      chain.style.marginLeft = 'auto';
+      item.appendChild(chain);
       item.dataset.cartIndex = i-1;
       cartListScroll.appendChild(item);
       cartListItems.push(item);
@@ -418,7 +424,23 @@
 
     // Tıklanabilirlik
     cartListItems.forEach((item, idx) => {
-      item.onclick = () => showCartPopup(idx);
+      // Zincir ikonuna tıklama
+      const chain = item.querySelector('.cart-chain-icon');
+      chain.onclick = (e) => {
+        e.stopPropagation();
+        if (connectedCarts[idx]) {
+          showCartPopup(idx);
+        } else {
+          showDisconnectedWarning();
+        }
+      };
+      // Satırın tamamına tıklama
+      item.onclick = (e) => {
+        // Zincir ikonuna tıklanmadıysa
+        if (e.target !== chain) {
+          showCartPopup(idx);
+        }
+      };
     });
 
     // BLE cihazı bağlandığında sıradaki arabaya ata
@@ -441,6 +463,15 @@
             icon.classList.add('connected');
             icon.title = 'Bağlı';
           }
+          // Zincir ikonunu güncelle
+          const chain = cartListItems[nextCartIndex].querySelector('.cart-chain-icon');
+          if (chain) {
+            chain.classList.remove('disconnected');
+            chain.classList.add('connected');
+            chain.querySelectorAll('path').forEach(p => {
+              p.setAttribute('stroke', '#4caf50');
+            });
+          }
           nextCartIndex++;
         }
         alert('BLE cihazına bağlandı: ' + device.name);
@@ -448,6 +479,80 @@
         alert('BLE bağlantısı başarısız: ' + error);
       }
     });
+    // Bağlantı durumu zincir ikonlarını başlat
+    cartListItems.forEach((item, idx) => {
+      const chain = item.querySelector('.cart-chain-icon');
+      if (chain) {
+        chain.classList.remove('connected');
+        chain.classList.add('disconnected');
+        chain.querySelectorAll('path').forEach(p => {
+          p.setAttribute('stroke', '#f44336');
+        });
+      }
+    });
+
+    // Bağlı değil uyarı popup'ı
+    function showDisconnectedWarning() {
+      const oldPopup = document.getElementById('cart-disconnected-popup');
+      if (oldPopup) oldPopup.remove();
+      const popup = document.createElement('div');
+      popup.id = 'cart-disconnected-popup';
+      popup.style.position = 'fixed';
+      popup.style.top = '0';
+      popup.style.left = '0';
+      popup.style.width = '100vw';
+      popup.style.height = '100vh';
+      popup.style.background = 'rgba(0,0,0,0.25)';
+      popup.style.display = 'flex';
+      popup.style.alignItems = 'center';
+      popup.style.justifyContent = 'center';
+      popup.style.zIndex = '9999';
+      const content = document.createElement('div');
+      content.style.background = '#fff';
+      content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+      content.style.borderRadius = '16px';
+      content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+      content.style.display = 'flex';
+      content.style.flexDirection = 'column';
+      content.style.alignItems = 'center';
+      content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Makret Arabası Şu Anda Bağlı Değil<br>Bağlantıyı Kontrol Edip Tekrar Deneyin</div>`;
+      const btn = document.createElement('button');
+      btn.textContent = 'Tamam';
+      btn.style.background = '#ee7624';
+      btn.style.color = '#fff';
+      btn.style.fontWeight = 'bold';
+      btn.style.fontSize = '1.1rem';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '7px';
+      btn.style.padding = '0.7rem 2.5rem';
+      btn.style.cursor = 'pointer';
+      btn.style.marginTop = '0.5rem';
+      btn.onclick = () => popup.remove();
+      content.appendChild(btn);
+      popup.appendChild(content);
+      document.body.appendChild(popup);
+    }
+</style>
+<style>
+  .cart-chain-icon {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
+  .cart-chain-icon svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+  .cart-chain-icon.connected svg path {
+    stroke: #4caf50 !important;
+  }
+  .cart-chain-icon.disconnected svg path {
+    stroke: #f44336 !important;
+  }
+</style>
     // Sayfa yüklendiğinde ikonları başlat
     cartListItems.forEach((item, idx) => {
       const icon = item.querySelector('.cart-status-icon');
