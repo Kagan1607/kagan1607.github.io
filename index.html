@@ -112,6 +112,62 @@
       border: 1px solid #ee7624;
       font-weight: 500;
       box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      cursor: pointer;
+    }
+    .cart-list-item.connected {
+      background: #ee7624;
+      color: #fff;
+      border: 2px solid #ee7624;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cart-list-popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .cart-list-popup-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      min-width: 260px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .cart-list-popup-content button {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.7rem 0;
+      font-size: 1rem;
+      border-radius: 7px;
+      border: none;
+      background: #ee7624;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cart-list-popup-content button:hover {
+      background: #d65d0e;
+    }
+    .cart-list-popup-content .popup-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ee7624;
+      margin-bottom: 0.5rem;
+    }
+    .cart-list-popup-content .popup-warning {
+      color: #d32f2f;
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
     }
   </style>
 </head>
@@ -295,12 +351,134 @@
           acceptAllDevices: true,
           optionalServices: ['battery_service'] // Örnek servis
         });
+        // Sıradaki arabaya ata
+        if (nextCartIndex < cartCount) {
+          connectedCarts[nextCartIndex] = true;
+          cartListItems[nextCartIndex].classList.add('connected');
+          nextCartIndex++;
+        }
         alert('BLE cihazına bağlandı: ' + device.name);
-        // Buraya gerçek veri okuma ve carts güncelleme kodu gelecek
       } catch (error) {
         alert('BLE bağlantısı başarısız: ' + error);
       }
     });
+
+    // Takip edilen market arabaları listesini doldur
+    const cartListScroll = document.querySelector('.cart-list-scroll');
+    const cartCount = 50;
+    const cartListItems = [];
+    let connectedCarts = [];
+    for(let i=1; i<=cartCount; i++) {
+      const item = document.createElement('div');
+      item.className = 'cart-list-item';
+      // Bağlantı ikonu
+      const icon = document.createElement('span');
+      icon.className = 'cart-status-icon disconnected';
+      icon.title = 'Bağlı değil';
+      item.appendChild(icon);
+      // Metin
+      const label = document.createElement('span');
+      label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+      item.appendChild(label);
+      item.dataset.cartIndex = i-1;
+      cartListScroll.appendChild(item);
+      cartListItems.push(item);
+    }
+
+    // Popup fonksiyonu
+    function showCartPopup(index) {
+      // Popup zaten varsa kaldır
+      const oldPopup = document.getElementById('cart-list-popup');
+      if (oldPopup) oldPopup.remove();
+      const popup = document.createElement('div');
+      popup.className = 'cart-list-popup';
+      popup.id = 'cart-list-popup';
+      const content = document.createElement('div');
+      content.className = 'cart-list-popup-content';
+      if (connectedCarts[index]) {
+        content.innerHTML = `<div class='popup-title'>${cartListItems[index].textContent}</div>`;
+        const btnHeat = document.createElement('button');
+        btnHeat.textContent = 'Isı Haritası';
+        btnHeat.onclick = () => { alert('Isı Haritası özelliği açılacak!'); };
+        const btnRoute = document.createElement('button');
+        btnRoute.textContent = 'Güzergah';
+        btnRoute.onclick = () => { alert('Güzergah özelliği açılacak!'); };
+        content.appendChild(btnHeat);
+        content.appendChild(btnRoute);
+      } else {
+        content.innerHTML = `<div class='popup-warning'>Böyle Bir Market Arabası Bulunamadı</div>`;
+      }
+      const btnClose = document.createElement('button');
+      btnClose.textContent = 'Kapat';
+      btnClose.onclick = () => popup.remove();
+      content.appendChild(btnClose);
+      popup.appendChild(content);
+      document.body.appendChild(popup);
+    }
+
+    // Tıklanabilirlik
+    cartListItems.forEach((item, idx) => {
+      item.onclick = () => showCartPopup(idx);
+    });
+
+    // BLE cihazı bağlandığında sıradaki arabaya ata
+    let nextCartIndex = 0;
+    connectedCarts = Array(cartCount).fill(false);
+    document.getElementById('connect-btn').addEventListener('click', async () => {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service']
+        });
+        // Sıradaki arabaya ata
+        if (nextCartIndex < cartCount) {
+          connectedCarts[nextCartIndex] = true;
+          cartListItems[nextCartIndex].classList.add('connected');
+          // Bağlantı ikonunu güncelle
+          const icon = cartListItems[nextCartIndex].querySelector('.cart-status-icon');
+          if (icon) {
+            icon.classList.remove('disconnected');
+            icon.classList.add('connected');
+            icon.title = 'Bağlı';
+          }
+          nextCartIndex++;
+        }
+        alert('BLE cihazına bağlandı: ' + device.name);
+      } catch (error) {
+        alert('BLE bağlantısı başarısız: ' + error);
+      }
+    });
+    // Sayfa yüklendiğinde ikonları başlat
+    cartListItems.forEach((item, idx) => {
+      const icon = item.querySelector('.cart-status-icon');
+      if (icon) {
+        icon.classList.remove('connected');
+        icon.classList.add('disconnected');
+        icon.title = 'Bağlı değil';
+      }
+    });
   </script>
+</style>
+<style>
+  .cart-status-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    border: 2px solid #bbb;
+    background: #f44336; /* kırmızı */
+    transition: background 0.2s, border 0.2s;
+  }
+  .cart-status-icon.connected {
+    background: #4caf50; /* yeşil */
+    border-color: #388e3c;
+  }
+  .cart-status-icon.disconnected {
+    background: #f44336; /* kırmızı */
+    border-color: #b71c1c;
+  }
+</style>
 </body>
 </html>
