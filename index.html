@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Arabası Takip Sistemi</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 0; background: #f0f0f0; }
+    header { background: #007bff; color: white; text-align: center; padding: 1rem; }
+    main { display: flex; justify-content: center; padding: 2rem; gap: 2rem; }
+    #store-map { position: relative; width: 800px; height: 500px; border: 2px solid #ccc; background-color: #fff; }
+    .cart { position: absolute; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+    #controls { display: flex; flex-direction: column; gap: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Market Arabası Takip Sistemi</h1>
+  </header>
+  <main>
+    <div id="store-map"></div>
+    <div id="controls">
+      <button id="connect-btn">BLE Cihazına Bağlan</button>
+      <button id="toggle-sim">Simülasyonu Aç/Kapa</button>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+  <script>
+    const storeMap = document.getElementById('store-map');
+
+    // Arabalar ve konumları
+    let carts = [
+      { id: 1, x: 50, y: 100 },
+      { id: 2, x: 200, y: 150 },
+      { id: 3, x: 400, y: 300 },
+    ];
+
+    let simulation = true;
+
+    // Heatmap ayarları
+    const heatmap = h337.create({
+      container: storeMap,
+      radius: 50,
+      maxOpacity: 0.6,
+      minOpacity: 0,
+      blur: 0.75,
+    });
+
+    function renderCarts() {
+      storeMap.innerHTML = '';
+      carts.forEach(cart => {
+        const cartEl = document.createElement('div');
+        cartEl.classList.add('cart');
+        cartEl.style.left = cart.x + 'px';
+        cartEl.style.top = cart.y + 'px';
+        cartEl.style.backgroundColor = `rgb(${Math.floor(cart.x/3)},0,${255-Math.floor(cart.y/2)})`;
+        cartEl.textContent = cart.id;
+        storeMap.appendChild(cartEl);
+      });
+      // Heatmap güncelle
+      heatmap.setData({
+        max: 10,
+        data: carts.map(c => ({ x: c.x + 20, y: c.y + 20, value: 5 }))
+      });
+    }
+
+    renderCarts();
+
+    function moveCarts() {
+      if(!simulation) return;
+      carts.forEach(cart => {
+        cart.x += Math.floor(Math.random() * 11 - 5);
+        cart.y += Math.floor(Math.random() * 11 - 5);
+        cart.x = Math.max(0, Math.min(760, cart.x));
+        cart.y = Math.max(0, Math.min(460, cart.y));
+      });
+      renderCarts();
+    }
+
+    setInterval(moveCarts, 1000);
+
+    // Simülasyonu aç/kapa
+    document.getElementById('toggle-sim').addEventListener('click', () => {
+      simulation = !simulation;
+    });
+
+    // BLE cihazına bağlan (Web Bluetooth API simülasyonu)
+    document.getElementById('connect-btn').addEventListener('click', async () => {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service'] // Örnek servis
+        });
+        alert('BLE cihazına bağlandı: ' + device.name);
+        // Buraya gerçek veri okuma ve carts güncelleme kodu gelecek
+      } catch (error) {
+        alert('BLE bağlantısı başarısız: ' + error);
+      }
+    });
+  </script>
+</body>
+</html>
