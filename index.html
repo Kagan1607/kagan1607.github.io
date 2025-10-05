@@ -371,6 +371,9 @@
     for(let i=1; i<=cartCount; i++) {
       const item = document.createElement('div');
       item.className = 'cart-list-item';
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.justifyContent = 'space-between';
       // Sol bağlantı ikonu (küçük daire)
       const icon = document.createElement('span');
       icon.className = 'cart-status-icon disconnected';
@@ -379,6 +382,8 @@
       // Metin
       const label = document.createElement('span');
       label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+      label.style.flex = '1';
+      label.style.marginLeft = '8px';
       item.appendChild(label);
       // Sağ zincir iconu (SVG olarak)
       const chain = document.createElement('span');
@@ -437,8 +442,12 @@
       // Satırın tamamına tıklama
       item.onclick = (e) => {
         // Zincir ikonuna tıklanmadıysa
-        if (e.target !== chain) {
-          showCartPopup(idx);
+        if (!chain.contains(e.target)) {
+          if (connectedCarts[idx]) {
+            showCartPopup(idx);
+          } else {
+            showDisconnectedWarning();
+          }
         }
       };
     });
@@ -532,58 +541,6 @@
       popup.appendChild(content);
       document.body.appendChild(popup);
     }
-</style>
-<style>
-  .cart-chain-icon {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    cursor: pointer;
-    transition: filter 0.2s;
-  }
-  .cart-chain-icon svg {
-    width: 22px;
-    height: 22px;
-    display: block;
-  }
-  .cart-chain-icon.connected svg path {
-    stroke: #4caf50 !important;
-  }
-  .cart-chain-icon.disconnected svg path {
-    stroke: #f44336 !important;
-  }
-</style>
-    // Sayfa yüklendiğinde ikonları başlat
-    cartListItems.forEach((item, idx) => {
-      const icon = item.querySelector('.cart-status-icon');
-      if (icon) {
-        icon.classList.remove('connected');
-        icon.classList.add('disconnected');
-        icon.title = 'Bağlı değil';
-      }
-    });
-  </script>
-</style>
-<style>
-  .cart-status-icon {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: middle;
-    border: 2px solid #bbb;
-    background: #f44336; /* kırmızı */
-    transition: background 0.2s, border 0.2s;
-  }
-  .cart-status-icon.connected {
-    background: #4caf50; /* yeşil */
-    border-color: #388e3c;
-  }
-  .cart-status-icon.disconnected {
-    background: #f44336; /* kırmızı */
-    border-color: #b71c1c;
-  }
-</style>
+</script>
 </body>
 </html>
