@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş | Migros Araç Takip Sistemi</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      min-width: 100vw;
+      background: url('giris-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      background: rgba(255,255,255,0.85);
+      border-radius: 18px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      padding: 2.5rem 2.5rem 2rem 2.5rem;
+      min-width: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .login-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+    .login-logo svg {
+      width: 180px;
+      height: 45px;
+      margin-bottom: 0.5rem;
+    }
+    .login-title {
+      font-size: 1.1rem;
+      color: #444;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .login-input {
+      width: 100%;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .login-input label {
+      font-size: 0.95rem;
+      color: #ee7624;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .login-input input {
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #ee7624;
+      border-radius: 7px;
+      font-size: 1rem;
+      outline: none;
+      background: #fff;
+      color: #222;
+      font-family: inherit;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 0.8rem 0;
+      background: #ee7624;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+    .login-btn:hover {
+      background: #d65d0e;
+    }
+    .login-error {
+      color: #d32f2f;
+      font-size: 0.98rem;
+      margin-top: 0.5rem;
+      min-height: 1.2em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-logo">
+      <svg width="180" height="45" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">MiGROS</text>
+      </svg>
+      <div class="login-title">Araba Takip Sistemine Giriş</div>
+    </div>
+    <form id="login-form" autocomplete="off">
+      <div class="login-input">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" id="username" name="username" placeholder="Kullanıcı adı" required autofocus>
+      </div>
+      <div class="login-input">
+        <label for="password">Şifre</label>
+        <input type="password" id="password" name="password" placeholder="Şifre" required>
+      </div>
+      <button class="login-btn" type="submit">Giriş Yap</button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorDiv = document.getElementById('login-error');
+      if(username === 'migros' && password === 'migros') {
+        window.location.href = 'index.html';
+      } else {
+        errorDiv.textContent = 'Kullanıcı adı veya şifre hatalı!';
+      }
+    });
+  </script>
+</body>
+</html>
