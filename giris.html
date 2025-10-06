@@ -4,100 +4,207 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giriş | Migros Market Arabası Takip Sistemi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: url('migros-bg.png') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
+      padding: 0;
+    }
+
+    body {
       height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, rgba(238,118,36,0.9), rgba(255,179,64,0.9)),
+                  url('migros-bg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
     }
+
     .login-container {
-      background: rgba(255,255,255,0.85);
-      border-radius: 18px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
-      padding: 2.5rem 2.5rem 2rem 2.5rem;
-      min-width: 350px;
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      padding: 3rem 2.5rem 2.5rem;
+      width: 350px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      animation: slideIn 1s ease forwards;
+      position: relative;
+      overflow: hidden;
     }
-    .login-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 1.2rem;
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .login-logo img {
+
+    .login-logo svg {
       width: 180px;
-      margin-bottom: 0.5rem;
+      height: 45px;
+      margin-bottom: 0.7rem;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
     }
+
     .login-title {
       font-size: 1.1rem;
-      color: #444;
-      margin-bottom: 1.5rem;
+      color: #fff;
+      margin-bottom: 1.8rem;
       font-weight: 500;
       letter-spacing: 0.5px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
+
     .login-input {
       width: 100%;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
       display: flex;
       flex-direction: column;
     }
+
     .login-input label {
       font-size: 0.95rem;
-      color: #ee7624;
-      margin-bottom: 0.3rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
       font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.15);
     }
+
     .login-input input {
-      padding: 0.7rem 1rem;
-      border-radius: 7px;
-      border: 1.5px solid #ee7624;
-      font-size: 1rem;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      border: none;
       outline: none;
-      margin-bottom: 0.2rem;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.9);
+      color: #222;
+      transition: all 0.25s ease;
     }
+
+    .login-input input:focus {
+      box-shadow: 0 0 0 3px rgba(238,118,36,0.4);
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .remember-forgot label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .remember-forgot a {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .remember-forgot a:hover {
+      opacity: 0.8;
+    }
+
     .login-btn {
       width: 100%;
-      background: #ff6600;
+      background: linear-gradient(135deg, #ff7b00, #ee7624);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 0.8rem 0;
+      border-radius: 10px;
+      padding: 0.9rem 0;
       font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
       margin-top: 0.5rem;
-      transition: background 0.2s;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 10px rgba(238,118,36,0.3);
     }
+
     .login-btn:hover {
-      background: #e65c00;
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(238,118,36,0.45);
     }
+
     .login-error {
-      color: #d32f2f;
-      font-size: 1rem;
-      margin-bottom: 0.7rem;
+      color: #ffebee;
+      background: rgba(211, 47, 47, 0.8);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.95rem;
       text-align: center;
+      margin-bottom: 0.8rem;
       display: none;
+      width: 100%;
+    }
+
+    /* Yükleniyor animasyonu */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loading-logo {
+      animation: spin 1.5s linear infinite;
+      transform-origin: center;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ee7624;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        width: 90%;
+        padding: 2rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="login-container">
     <div class="login-logo">
-      <svg width="180" height="45" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
-        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">MiGROS</text>
+      <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text>
       </svg>
     </div>
-    <div class="login-title">Migros Market Arabası Takip Sistemi Giriş</div>
+    <div class="login-title">Market Arabası Takip Sistemine Giriş</div>
     <div id="loginError" class="login-error">Kullanıcı adı veya şifre hatalı!</div>
+
     <form id="loginForm" autocomplete="off">
       <div class="login-input">
         <label for="username">Kullanıcı Adı</label>
@@ -107,120 +214,42 @@
         <label for="password">Şifre</label>
         <input type="password" id="password" name="password" required>
       </div>
+
+      <div class="remember-forgot">
+        <label><input type="checkbox" id="rememberMe"> Beni Hatırla</label>
+        <a href="#">Şifremi unuttum?</a>
+      </div>
+
       <button type="submit" class="login-btn">Giriş Yap</button>
     </form>
+
+    <div class="loading-overlay" id="loadingOverlay">
+      <svg class="loading-logo" width="70" height="70" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">M</text>
+      </svg>
+      <div class="loading-text">Giriş Yapılıyor...</div>
+    </div>
   </div>
+
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const form = document.getElementById('loginForm');
+    const errorDiv = document.getElementById('loginError');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value.trim();
-      if(user === 'migros' && pass === 'migros') {
-        window.location.href = 'index.html';
+
+      if (user === 'migros' && pass === 'migros') {
+        loadingOverlay.classList.add('active');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
       } else {
-        document.getElementById('loginError').style.display = 'block';
+        errorDiv.style.display = 'block';
       }
     });
   </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giriş | Migros Araç Takip Sistemi</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      min-height: 100vh;
-      min-width: 100vw;
-  background: url('migros-bg.png') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .login-container {
-      background: rgba(255,255,255,0.85);
-      border-radius: 18px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
-      padding: 2.5rem 2.5rem 2rem 2.5rem;
-      min-width: 350px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .login-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 1.2rem;
-    }
-    .login-logo svg {
-      width: 180px;
-      height: 45px;
-      margin-bottom: 0.5rem;
-    }
-    .login-title {
-      font-size: 1.1rem;
-      color: #444;
-      margin-bottom: 1.5rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-    .login-input {
-      width: 100%;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .login-input label {
-      font-size: 0.95rem;
-      color: #ee7624;
-      margin-bottom: 0.3rem;
-      font-weight: 600;
-    }
-    .login-input input {
-      padding: 0.7rem 1rem;
-      border: 1.5px solid #ee7624;
-      border-radius: 7px;
-      font-size: 1rem;
-      outline: none;
-      background: #fff;
-      color: #222;
-      font-family: inherit;
-    }
-    .login-btn {
-      width: 100%;
-      padding: 0.8rem 0;
-      background: #ee7624;
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.2s;
-    }
-    .login-btn:hover {
-      background: #d65d0e;
-    }
-    .login-error {
-      color: #d32f2f;
-      font-size: 0.98rem;
-      margin-top: 0.5rem;
-      min-height: 1.2em;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <!-- Alttaki ikinci giriş kutusu kaldırıldı -->
 </body>
 </html>
