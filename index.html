@@ -1,73 +1,76 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Migros - Market Arabası Takip Sistemi</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Migros - Market Arabası Takip Sistemi</title>
 
-  <!-- Heatmap.js -->
-  <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+<!-- Heatmap.js -->
+<script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
 
-  <style>
-    body { margin:0; font-family: Arial, sans-serif; background:#f6f7f9; color:#222;}
-    header{background:#ee7624; color:#fff; padding:14px 20px; display:flex; align-items:center; gap:16px;}
-    header .title{font-weight:800;font-size:1.25rem;}
-    main{display:flex; gap:18px; padding:18px; height:calc(100vh - 68px);}
-    #store-map{flex:1; background:#fff; border-radius:12px; box-shadow:0 6px 26px rgba(0,0,0,0.08); position:relative; overflow:hidden; min-width:800px; border:1px solid rgba(0,0,0,0.06);}
-    .shelf{position:absolute; background:#fff6eb; border:2px solid #ee7624; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:600; color:#6b6b6b; font-size:0.85rem; padding:6px 8px;}
-    .shelf .tag{position:absolute; top:-18px; left:6px; background:#ee7624; color:#fff; font-size:11px; padding:3px 8px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,0.08);}
-    .cart{position:absolute; width:40px;height:40px;border-radius:50%; display:flex;align-items:center;justify-content:center; color:#fff;font-weight:700; z-index:8; box-shadow:0 6px 16px rgba(0,0,0,0.12); cursor:default; transition: transform 120ms linear; user-select:none;}
-    .cart.connected{outline:3px solid rgba(78,200,125,0.12);}
-    .cart-label{position:absolute;left:50%;transform:translateX(-50%);top:44px;font-size:12px;color:#6b6b6b;}
-    .side{width:320px; display:flex; flex-direction:column; gap:14px;}
-    .panel{background:#fff3e0; border:2px solid #ee7624; border-radius:12px; padding:14px; box-shadow:0 6px 26px rgba(0,0,0,0.08);}
-    .controls .row{display:flex;gap:8px; margin-bottom:8px;}
-    button.action{padding:10px 12px;border-radius:8px;border:none;background:#ee7624;color:#fff;font-weight:700;cursor:pointer;}
-    button.ghost{background:#fff;border:1px solid rgba(0,0,0,0.06);color:#6b6b6b;font-weight:700;}
-    .cart-list-scroll{max-height:360px; overflow:auto;}
-    .cart-list-item{display:flex;align-items:center;justify-content:space-between;padding:8px;background:#fff;border-radius:8px;margin-bottom:8px;border:1px solid rgba(0,0,0,0.04); font-weight:600; cursor:pointer;}
-    .cart-dot{width:12px;height:12px;border-radius:50%;margin-right:10px;flex:0 0 12px;}
-    .connected .cart-dot{background:#4caf50;}
-    .disconnected .cart-dot{background:#f44336;}
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:9999;}
-    .modal{background:#fff;border-radius:12px;padding:18px;min-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.16);}
-    .modal h3{margin:0 0 8px 0;color:#ee7624;}
-    .modal p{margin:0 0 12px 0;color:#444;}
-    .modal button{margin-left:8px;}
-    .tooltip{position:absolute; pointer-events:none; background:rgba(0,0,0,0.85); color:#fff; padding:8px 10px; border-radius:8px; font-size:12px; z-index:9999; transform:translate(-50%,-120%); white-space:nowrap; display:none;}
-  </style>
+<style>
+body { margin:0; font-family: Arial, sans-serif; background:#f6f7f9; color:#222;}
+header{background:#ee7624; color:#fff; padding:14px 20px; display:flex; align-items:center; justify-content:space-between;}
+header .title{font-weight:800;font-size:1.25rem;}
+header button{padding:8px 12px; border:none;border-radius:6px;cursor:pointer;font-weight:700;background:#fff;color:#ee7624;}
+main{display:flex; gap:18px; padding:18px; height:calc(100vh - 68px);}
+#store-map{flex:1; background:#fff; border-radius:12px; box-shadow:0 6px 26px rgba(0,0,0,0.08); position:relative; overflow:hidden; min-width:800px; border:1px solid rgba(0,0,0,0.06);}
+.shelf{position:absolute; background:#fff6eb; border:2px solid #ee7624; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:600; color:#6b6b6b; font-size:0.85rem; padding:6px 8px;}
+.shelf .tag{position:absolute; top:-18px; left:6px; background:#ee7624; color:#fff; font-size:11px; padding:3px 8px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,0.08);}
+.cart{position:absolute; width:40px;height:40px;border-radius:50%; display:flex;align-items:center;justify-content:center; color:#fff;font-weight:700; z-index:8; box-shadow:0 6px 16px rgba(0,0,0,0.12); cursor:default; transition: transform 120ms linear; user-select:none; background:orange;}
+.cart-label{position:absolute;left:50%;transform:translateX(-50%);top:44px;font-size:12px;color:#6b6b6b;}
+.side{width:320px; display:flex; flex-direction:column; gap:14px;}
+.panel{background:#fff3e0; border:2px solid #ee7624; border-radius:12px; padding:14px; box-shadow:0 6px 26px rgba(0,0,0,0.08);}
+.controls .row{display:flex;gap:8px; margin-bottom:8px;}
+button.action{padding:10px 12px;border-radius:8px;border:none;background:#ee7624;color:#fff;font-weight:700;cursor:pointer;}
+button.ghost{background:#fff;border:1px solid rgba(0,0,0,0.06);color:#6b6b6b;font-weight:700;}
+.cart-list-scroll{max-height:360px; overflow:auto;}
+.cart-list-item{display:flex;align-items:center;justify-content:space-between;padding:8px;background:#fff;border-radius:8px;margin-bottom:8px;border:1px solid rgba(0,0,0,0.04); font-weight:600; cursor:pointer;}
+.cart-dot{width:12px;height:12px;border-radius:50%;margin-right:10px;flex:0 0 12px;}
+.connected .cart-dot{background:#4caf50;}
+.disconnected .cart-dot{background:#f44336;}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:9999;}
+.modal{background:#fff;border-radius:12px;padding:18px;min-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.16);}
+.modal h3{margin:0 0 8px 0;color:#ee7624;}
+.modal p{margin:0 0 12px 0;color:#444;}
+.modal button{margin-left:8px;}
+.tooltip{position:absolute; pointer-events:none; background:rgba(0,0,0,0.85); color:#fff; padding:8px 10px; border-radius:8px; font-size:12px; z-index:9999; transform:translate(-50%,-120%); white-space:nowrap; display:none;}
+</style>
 </head>
 <body>
 <header>
-  <svg width="160" height="34" viewBox="0 0 520 120"><text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text></svg>
-  <div class="title">MARKET ARABASI TAKİP SİSTEMİ</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <svg width="160" height="34" viewBox="0 0 520 120"><text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text></svg>
+    <div class="title">MARKET ARABASI TAKİP SİSTEMİ</div>
+  </div>
+  <button onclick="alert('Çıkış yapıldı!')">Çıkış Yap</button>
 </header>
 
 <main>
-  <div id="store-map" aria-label="Mağaza Haritası">
-    <div id="tooltip" class="tooltip"></div>
-  </div>
+<div id="store-map" aria-label="Mağaza Haritası">
+  <div id="tooltip" class="tooltip"></div>
+</div>
 
-  <div class="side">
-    <div class="panel controls">
-      <div style="display:flex;justify-content:space-between; margin-bottom:8px;">
-        <div style="font-weight:800;color:#ee7624;">Kontroller</div>
-        <div style="font-size:12px;color:#6b6b6b;">Simülasyon & Isı Haritası</div>
-      </div>
-      <div class="row">
-        <button id="toggle-sim" class="action">Simülasyonu Başlat</button>
-        <button id="toggle-heatmap" class="ghost">Isı Haritasını Göster</button>
-      </div>
-      <div class="row">
-        <button id="connect-btn" class="ghost">BLE Cihazına Bağlan (Sim)</button>
-        <button id="follow-btn" class="ghost">Takip Modu: Kapalı</button>
-      </div>
+<div class="side">
+  <div class="panel controls">
+    <div style="display:flex;justify-content:space-between; margin-bottom:8px;">
+      <div style="font-weight:800;color:#ee7624;">Kontroller</div>
+      <div style="font-size:12px;color:#6b6b6b;">Simülasyon & Isı Haritası</div>
     </div>
-    <div class="panel">
-      <div class="list-title">Takip Edilen Market Arabaları (1–50)</div>
-      <div class="cart-list-scroll" id="cart-list"></div>
+    <div class="row">
+      <button id="toggle-sim" class="action">Simülasyonu Başlat</button>
+      <button id="toggle-heatmap" class="ghost">Isı Haritasını Göster</button>
+    </div>
+    <div class="row">
+      <button id="connect-btn" class="ghost">BLE Cihazına Bağlan (Sim)</button>
+      <button id="follow-btn" class="ghost">Takip Modu: Kapalı</button>
     </div>
   </div>
+  <div class="panel">
+    <div class="list-title">Takip Edilen Market Arabaları (1–50)</div>
+    <div class="cart-list-scroll" id="cart-list"></div>
+  </div>
+</div>
 </main>
 
 <div id="modal-backdrop" class="modal-backdrop">
@@ -100,29 +103,46 @@ let simRunning = false;
 let followMode = false;
 let heatmapVisible = false;
 
+// REYONLAR
 const shelves = [
-  { x: 60, y: 40, w: 120, h: 36, label: 'Kahvaltılık' },
-  { x: 60, y: 100, w: 120, h: 36, label: 'Atıştırmalık' },
-  { x: 220, y: 40, w: 120, h: 36, label: 'İçecek' },
-  { x: 220, y: 100, w: 120, h: 36, label: 'Süt Ürünleri' },
-  { x: 400, y: 40, w: 150, h: 36, label: 'Temizlik' },
-  { x: 400, y: 100, w: 150, h: 36, label: 'Kişisel Bakım' },
-  { x: 60, y: 200, w: 490, h: 36, label: 'Kasiyer' },
-  { x: 60, y: 260, w: 490, h: 36, label: 'Kampanyalar' },
-  { x: 60, y: 320, w: 490, h: 36, label: 'Depo' }
+  { x: 50, y: 30, w: 100, h: 30, label: 'Kahvaltılık' },
+  { x: 180, y: 50, w: 120, h: 30, label: 'Atıştırmalık' },
+  { x: 350, y: 40, w: 120, h: 30, label: 'İçecek' },
+  { x: 120, y: 130, w: 100, h: 30, label: 'Süt Ürünleri' },
+  { x: 280, y: 140, w: 140, h: 30, label: 'Temizlik' },
+  { x: 420, y: 130, w: 120, h: 30, label: 'Kişisel Bakım' },
+  { x: 50, y: 220, w: 150, h: 30, label: 'Kasiyer' },
+  { x: 220, y: 240, w: 150, h: 30, label: 'Kampanyalar' },
+  { x: 400, y: 250, w: 120, h: 30, label: 'Depo' }
 ];
 
 function renderShelves(){
   shelves.forEach(s=>{
     const el = document.createElement('div');
     el.className='shelf';
-    el.style.left = s.x+'px'; el.style.top = s.y+'px'; el.style.width = s.w+'px'; el.style.height = s.h+'px';
+    el.style.left = s.x+'px';
+    el.style.top = s.y+'px';
+    el.style.width = s.w+'px';
+    el.style.height = s.h+'px';
     el.innerHTML = `<div class="tag">${s.label}</div><div style="opacity:0.9">${s.label}</div>`;
     storeMap.appendChild(el);
   });
 }
 renderShelves();
 
+// KORİDOR TANIMI
+const corridors = [
+  {x:0,y:0,w:180,h:360},
+  {x:180,y:0,w:140,h:200},
+  {x:180,y:200,w:140,h:160},
+  {x:320,y:0,w:200,h:360}
+];
+
+function isInsideCorridor(x,y){
+  return corridors.some(c=> x>=c.x && x<=c.x+c.w-40 && y>=c.y && y<=c.y+c.h-40 );
+}
+
+// MARKET ARABALARI
 function getRandomNonOverlapping(existing,size=48){
   let attempts=0;
   while(attempts++<200){
@@ -141,10 +161,15 @@ function createMapCarts(){
     existing.push(pos);
     const el = document.createElement('div');
     el.className='cart connected';
-    el.style.left = pos.x+'px'; el.style.top = pos.y+'px';
-    el.textContent = i+1;
+    el.style.left = pos.x+'px';
+    el.style.top = pos.y+'px';
+    el.innerHTML = `<span style="color:white;font-weight:bold">${i+1}</span>`;
     storeMap.appendChild(el);
-    mapCarts.push({index:i,el,x:pos.x,y:pos.y,vx:(Math.random()-0.5)*1.4,vy:(Math.random()-0.5)*1.4});
+    mapCarts.push({
+      index:i, el, x:pos.x, y:pos.y,
+      vx:(Math.random()-0.5)*1.4,
+      vy:(Math.random()-0.5)*1.4
+    });
   }
 }
 createMapCarts();
@@ -162,9 +187,14 @@ function onCartListClick(idx){
     const mc = mapCarts.find(c=>c.index===idx);
     if(mc){
       const ring = document.createElement('div');
-      ring.style.position='absolute'; ring.style.left=(mc.x-6)+'px'; ring.style.top=(mc.y-6)+'px';
-      ring.style.width='52px'; ring.style.height='52px'; ring.style.border='3px solid rgba(78,200,125,0.85)';
-      ring.style.borderRadius='50%'; storeMap.appendChild(ring);
+      ring.style.position='absolute';
+      ring.style.left=(mc.x-6)+'px';
+      ring.style.top=(mc.y-6)+'px';
+      ring.style.width='52px';
+      ring.style.height='52px';
+      ring.style.border='3px solid rgba(78,200,125,0.85)';
+      ring.style.borderRadius='50%';
+      storeMap.appendChild(ring);
       setTimeout(()=>storeMap.removeChild(ring),1200);
     }
   } else {
@@ -185,20 +215,41 @@ function renderCartList(){
 }
 renderCartList();
 
+// GÜNCELLEME & HAREKET
 function updateCarts(){
   mapCarts.forEach(c=>{
-    c.x+=c.vx; c.y+=c.vy;
-    if(c.x<10||c.x>storeMap.offsetWidth-50) c.vx*=-1;
-    if(c.y<10||c.y>storeMap.offsetHeight-50) c.vy*=-1;
-    c.el.style.left=c.x+'px';
-    c.el.style.top=c.y+'px';
+    c.x += c.vx;
+    c.y += c.vy;
+
+    // Koridor kontrolü
+    if(!isInsideCorridor(c.x,c.y)){
+      if(Math.random()<0.5) c.vx*=-1; else c.vy*=-1;
+      c.x = Math.max(0, Math.min(storeMap.offsetWidth-40, c.x));
+      c.y = Math.max(0, Math.min(storeMap.offsetHeight-40, c.y));
+    }
+
+    // Reyon çarpması
+    shelves.forEach(s=>{
+      if(c.x+40 > s.x && c.x < s.x + s.w && c.y+40 > s.y && c.y < s.y + s.h){
+        if(Math.random()<0.5) c.vx*=-1; else c.vy*=-1;
+      }
+    });
+
+    // Duvar çarpması
+    if(c.x<0 || c.x>storeMap.offsetWidth-40) c.vx*=-1;
+    if(c.y<0 || c.y>storeMap.offsetHeight-40) c.vy*=-1;
+
+    c.el.style.left = c.x+'px';
+    c.el.style.top = c.y+'px';
   });
+
   if(followMode && mapCarts.length>0){
     storeMap.scrollLeft = mapCarts[0].x - storeMap.offsetWidth/2;
     storeMap.scrollTop = mapCarts[0].y - storeMap.offsetHeight/2;
   }
 }
 
+// SIMULASYON & TAKİP
 let simInterval;
 simToggleBtn.addEventListener('click',()=>{
   simRunning=!simRunning;
@@ -212,23 +263,25 @@ followBtn.addEventListener('click',()=>{
   followBtn.textContent='Takip Modu: '+(followMode?'Açık':'Kapalı');
 });
 
-connectBtn.addEventListener('click',()=>{
-  alert('BLE cihazına simülasyon üzerinden bağlanıldı!');
-});
+connectBtn.addEventListener('click',()=>{ alert('BLE cihazına simülasyon üzerinden bağlanıldı!'); });
 
+// ISI HARİTASI
 let heatmapInstance;
+let heatmapInterval;
 heatToggleBtn.addEventListener('click',()=>{
   heatmapVisible=!heatmapVisible;
   heatToggleBtn.textContent = heatmapVisible?'Isı Haritasını Gizle':'Isı Haritasını Göster';
   if(heatmapVisible){
-    heatmapInstance = h337.create({container:storeMap, radius:20, maxOpacity:.5, minOpacity:0, blur:.75});
-    setInterval(()=>{
-      const points = mapCarts.map(c=>({x:c.x+20,y:c.y+20,value:10}));
+    if(!heatmapInstance) heatmapInstance = h337.create({container:storeMap, radius:30, maxOpacity:0.5, minOpacity:0, blur:0.75});
+    heatmapInterval = setInterval(()=>{
+      const points = mapCarts.map(c=>({x:c.x+20, y:c.y+20, value:5}));
       heatmapInstance.setData({max:10,data:points});
     },100);
   } else if(heatmapInstance){
-    storeMap.innerHTML=''; renderShelves(); createMapCarts(); renderCartList();
-    heatmapInstance=null;
+    clearInterval(heatmapInterval);
+    heatmapInstance.setData({max:0,data:[]});
   }
 });
 </script>
+</body>
+</html>
