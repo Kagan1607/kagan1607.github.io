@@ -43,7 +43,7 @@ button.ghost{background:#fff;border:1px solid rgba(0,0,0,0.06);color:#6b6b6b;fon
     <svg width="160" height="34" viewBox="0 0 520 120"><text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text></svg>
     <div class="title">MARKET ARABASI TAKİP SİSTEMİ</div>
   </div>
-  <button onclick="alert('Çıkış yapıldı!')">Çıkış Yap</button>
+  <button onclick="logout()">Çıkış Yap</button>
 </header>
 
 <main>
@@ -82,6 +82,11 @@ button.ghost{background:#fff;border:1px solid rgba(0,0,0,0.06);color:#6b6b6b;fon
 </div>
 
 <script>
+function logout() {
+  alert('Çıkış yapıldı!');
+  window.location.href = 'giris.html'; // yönlendirme giris.html
+}
+
 const storeMap = document.getElementById('store-map');
 const tooltip = document.getElementById('tooltip');
 const cartListEl = document.getElementById('cart-list');
@@ -103,7 +108,7 @@ let simRunning = false;
 let followMode = false;
 let heatmapVisible = false;
 
-// REYONLAR (Labirent gibi yerleştirilmiş)
+// REYONLAR
 const shelves = [
   { x: 50, y: 30, w: 100, h: 30, label: 'Kahvaltılık' },
   { x: 180, y: 50, w: 120, h: 30, label: 'Atıştırmalık' },
@@ -116,7 +121,7 @@ const shelves = [
   { x: 400, y: 250, w: 120, h: 30, label: 'Depo' }
 ];
 
-// LABİRENT KORİDOR ALANLARI
+// KORİDOR ALANLARI
 const corridors = [
   {x:0,y:0,w:180,h:360},
   {x:180,y:0,w:140,h:200},
@@ -173,6 +178,7 @@ function createMapCarts(){
 }
 createMapCarts();
 
+// --- Tooltip, Cart List ve Simülasyon Kodu ---
 function showTooltip(text,x,y){ tooltip.style.left=x+'px'; tooltip.style.top=y+'px'; tooltip.innerText=text; tooltip.style.display='block'; }
 function hideTooltip(){ tooltip.style.display='none'; }
 
@@ -277,3 +283,5 @@ heatToggleBtn.addEventListener('click',()=>{
   }
 });
 </script>
+</body>
+</html>
