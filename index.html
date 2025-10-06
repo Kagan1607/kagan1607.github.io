@@ -879,22 +879,47 @@
 </body>
 </html>
 <script>
-  // --- Yeni Simülasyon: Rastgele Dolaşan 1-10 Daire ---
+  // --- Simülasyon Arabaları ---
   const simCarts = [];
   const simCartCount = 10;
-  let simRunning = false;
+  const simCartSize = 30;
+  let simRunning = true;
+  let simHeatmapVisible = true;
 
-  // Simülasyon için daireleri oluştur
+  // Arabaların başlangıç konumları (çarpışmayı önlemek için kontrol edilecek)
+  function getRandomPosition(existingCarts) {
+    let x, y, safe;
+    let attempts = 0;
+    do {
+      safe = true;
+      x = Math.random() * (storeMap.offsetWidth - simCartSize);
+      y = Math.random() * (storeMap.offsetHeight - simCartSize);
+      for (const c of existingCarts) {
+        const dx = x - parseFloat(c.style.left);
+        const dy = y - parseFloat(c.style.top);
+        if (Math.sqrt(dx*dx + dy*dy) < simCartSize*1.2) { // birbirine çarpmayacak
+          safe = false;
+          break;
+        }
+      }
+      attempts++;
+      if (attempts > 50) break; // sonsuz döngü olmasın
+    } while (!safe);
+    return {x, y};
+  }
+
+  // Simülasyon arabalarını oluştur
   for (let i = 1; i <= simCartCount; i++) {
     const cartEl = document.createElement('div');
     cartEl.classList.add('cart');
-    cartEl.style.width = '30px';
-    cartEl.style.height = '30px';
+    cartEl.style.width = simCartSize + 'px';
+    cartEl.style.height = simCartSize + 'px';
     cartEl.style.borderRadius = '50%';
     cartEl.style.backgroundColor = `hsl(${i*36}, 70%, 50%)`;
     cartEl.style.position = 'absolute';
-    cartEl.style.left = `${Math.random() * (storeMap.offsetWidth - 30)}px`;
-    cartEl.style.top = `${Math.random() * (storeMap.offsetHeight - 30)}px`;
+    const pos = getRandomPosition(simCarts);
+    cartEl.style.left = pos.x + 'px';
+    cartEl.style.top = pos.y + 'px';
     cartEl.textContent = i;
     cartEl.style.fontSize = '14px';
     cartEl.style.fontWeight = 'bold';
@@ -905,26 +930,128 @@
     simCarts.push(cartEl);
   }
 
-  // Takibi Aç/Kapa butonuna bağla
-  const simToggleBtn = document.getElementById('toggle-sim');
-  simToggleBtn.addEventListener('click', () => {
-    simRunning = !simRunning;
+  // Isı haritası oluştur
+  const simHeatmap = h337.create({
+    container: storeMap,
+    radius: 50,
+    maxOpacity: 0.6,
+    minOpacity: 0,
+    blur: 0.75
   });
 
-  // Daireleri hareket ettir
+  function updateHeatmap() {
+    if (!simHeatmapVisible) {
+      simHeatmap._renderer.canvas.style.display = 'none';
+      return;
+    }
+    simHeatmap.setData({
+      max: 10,
+      data: simCarts.map(c => {
+        return {
+          x: parseFloat(c.style.left) + simCartSize/2,
+          y: parseFloat(c.style.top) + simCartSize/2,
+          value: 5 + Math.random()*5
+        };
+      })
+    });
+    simHeatmap._renderer.canvas.style.display = '';
+  }
+
+  // Arabaları hareket ettir (çarpışma önleme)
   function moveSimCarts() {
     if (!simRunning) return;
-    simCarts.forEach(cart => {
-      let x = parseFloat(cart.style.left);
-      let y = parseFloat(cart.style.top);
-      x += Math.random() * 10 - 5;
-      y += Math.random() * 10 - 5;
-      x = Math.max(0, Math.min(storeMap.offsetWidth - 30, x));
-      y = Math.max(0, Math.min(storeMap.offsetHeight - 30, y));
+    for (let i = 0; i < simCarts.length; i++) {
+      const cart = simCarts[i];
+      let x = parseFloat(cart.style.left) + Math.random()*10-5;
+      let y = parseFloat(cart.style.top) + Math.random()*10-5;
+
+      // Sınırlar
+      x = Math.max(0, Math.min(storeMap.offsetWidth - simCartSize, x));
+      y = Math.max(0, Math.min(storeMap.offsetHeight - simCartSize, y));
+
+      // Diğer arabalarla çarpışmayı önle
+      for (let j = 0; j < simCarts.length; j++) {
+        if (i === j) continue;
+        const other = simCarts[j];
+        const dx = x - parseFloat(other.style.left);
+        const dy = y - parseFloat(other.style.top);
+        if (Math.sqrt(dx*dx + dy*dy) < simCartSize*1.2) {
+          x -= dx*0.5;
+          y -= dy*0.5;
+        }
+      }
+
       cart.style.left = x + 'px';
       cart.style.top = y + 'px';
-    });
+    }
+
+    updateHeatmap();
   }
 
   setInterval(moveSimCarts, 500);
+
+  // Takibi Aç/Kapa ve Isı Haritası Göster/Gizle
+  document.getElementById('toggle-sim').addEventListener('click', () => simRunning = !simRunning);
+  document.getElementById('toggle-heatmap').addEventListener('click', () => {
+    simHeatmapVisible = !simHeatmapVisible;
+    updateHeatmap();
+    document.getElementById('toggle-heatmap').textContent = simHeatmapVisible ? 'Isı Haritasını Gizle' : 'Isı Haritasını Göster';
+  });
+
+  // Sağ paneldeki arabayı takip etme / bağlı değilse uyarı
+  cartListItems.forEach((item, idx) => {
+    item.onclick = () => {
+      if (!connectedCarts[idx]) {
+        // Uyarı popup
+        const oldPopup = document.getElementById('cart-disconnected-popup');
+        if (oldPopup) oldPopup.remove();
+
+        const popup = document.createElement('div');
+        popup.id = 'cart-disconnected-popup';
+        popup.style.position = 'fixed';
+        popup.style.top = '0';
+        popup.style.left = '0';
+        popup.style.width = '100vw';
+        popup.style.height = '100vh';
+        popup.style.background = 'rgba(0,0,0,0.25)';
+        popup.style.display = 'flex';
+        popup.style.alignItems = 'center';
+        popup.style.justifyContent = 'center';
+        popup.style.zIndex = '9999';
+
+        const content = document.createElement('div');
+        content.style.background = '#fff';
+        content.style.padding = '2rem 2.5rem';
+        content.style.borderRadius = '16px';
+        content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+        content.style.display = 'flex';
+        content.style.flexDirection = 'column';
+        content.style.alignItems = 'center';
+        content.innerHTML = `<div style="font-size:1.15rem;font-weight:600;color:#d32f2f;text-align:center;">
+          Bu Market Arabası Bağlı Değil<br>Lütfen Tekrar Deneyiniz
+        </div>`;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Tamam';
+        btn.style.marginTop = '1rem';
+        btn.style.padding = '0.7rem 2.5rem';
+        btn.style.background = '#ee7624';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '7px';
+        btn.style.fontWeight = 'bold';
+        btn.style.fontSize = '1.1rem';
+        btn.style.cursor = 'pointer';
+        btn.onclick = () => popup.remove();
+
+        content.appendChild(btn);
+        popup.appendChild(content);
+        document.body.appendChild(popup);
+
+      } else {
+        alert(`Market Arabası ${idx+1} takip ediliyor (connected).`);
+        // İstersen burada simCarts veya gerçek carts ile eşleştirip takip animasyonu ekleyebiliriz.
+      }
+    };
+  });
 </script>
