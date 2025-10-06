@@ -92,7 +92,9 @@
 <body>
   <div class="login-container">
     <div class="login-logo">
-      <img src="MiGROS_Logo.svg.png" alt="Migros Logo">
+      <svg width="180" height="45" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">MiGROS</text>
+      </svg>
     </div>
     <div class="login-title">Migros Market Arabası Takip Sistemi Giriş</div>
     <div id="loginError" class="login-error">Kullanıcı adı veya şifre hatalı!</div>
@@ -219,41 +221,6 @@
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-logo">
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-        <svg width="180" height="45" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
-          <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#ee7624">MiGROS</text>
-        </svg>
-        <img src="MİGROS_Logo.svg.png" alt="" style="height: 45px; width: auto; display: block; margin: 0 auto;" />
-      </div>
-      <div class="login-title">Araba Takip Sistemine Giriş</div>
-    </div>
-    <form id="login-form" autocomplete="off">
-      <div class="login-input">
-        <label for="username">Kullanıcı Adı</label>
-        <input type="text" id="username" name="username" placeholder="Kullanıcı adı" required autofocus>
-      </div>
-      <div class="login-input">
-        <label for="password">Şifre</label>
-        <input type="password" id="password" name="password" placeholder="Şifre" required>
-      </div>
-      <button class="login-btn" type="submit">Giriş Yap</button>
-      <div class="login-error" id="login-error"></div>
-    </form>
-  </div>
-  <script>
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorDiv = document.getElementById('login-error');
-      if(username === 'migros' && password === 'migros') {
-        window.location.href = 'index.html';
-      } else {
-        errorDiv.textContent = 'Kullanıcı adı veya şifre hatalı!';
-      }
-    });
-  </script>
+  <!-- Alttaki ikinci giriş kutusu kaldırıldı -->
 </body>
 </html>
