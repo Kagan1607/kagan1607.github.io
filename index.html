@@ -5,6 +5,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Migros Market Arabası Takip Sistemi</title>
   <style>
+    /* Çıkış modalı ve butonu için ek stiller */
+    .logout-btn{
+      cursor:pointer;
+      background:transparent;
+      border:1px solid transparent;
+      padding:10px 14px;
+      border-radius:6px;
+      font-weight:600;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+    }
+    .logout-btn:hover{
+      background:rgba(0,0,0,0.04);
+    }
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.35);
+      z-index:2000;
+      padding:20px;
+    }
+    .overlay.show{display:flex;}
+    .dialog{
+      width:420px;
+      max-width:100%;
+      background:#fff;
+      border-radius:8px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      overflow:hidden;
+      outline: none;
+    }
+    .titlebar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      background:linear-gradient(180deg, #f3f6fa, #e9eef6);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+    }
+    .titlebar img{
+      width:20px;height:20px;
+    }
+    .titlebar .title{
+      font-weight:700;
+      font-size:14px;
+      flex:1;
+    }
+    .dialog-body{
+      display:flex;
+      gap:14px;
+      padding:18px 16px;
+      align-items:flex-start;
+    }
+    .dialog-body .icon{
+      width:44px;height:44px;
+      flex:0 0 44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:6px;
+      background:linear-gradient(180deg,#fff,#f6fbff);
+      border:1px solid rgba(0,0,0,0.04);
+    }
+    .dialog-body p{
+      margin:0;
+      font-size:15px;
+      line-height:1.4;
+    }
+    .dialog-footer{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      padding:12px 16px;
+      border-top:1px solid rgba(0,0,0,0.04);
+      background: #fbfcfe;
+    }
+    button.btn{
+      min-width:88px;
+      padding:8px 12px;
+      border-radius:6px;
+      border:1px solid rgba(0,0,0,0.08);
+      font-weight:600;
+      cursor:pointer;
+      background:#fff;
+    }
+    button.primary{
+      background:#ee7624;
+      color:white;
+      border-color:rgba(0,0,0,0.08);
+    }
+    button:focus{
+      outline:3px solid rgba(0,120,215,0.18);
+      outline-offset:2px;
+    }
     body { font-family: Arial; margin: 0; padding: 0; background: #f0f0f0; }
   header { background: #ee7624; color: white; text-align: center; padding: 1rem; }
     main {
@@ -178,11 +276,44 @@
         <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text>
       </svg>
       <span style="font-size: 2.1rem; font-weight: bold; letter-spacing: 1px; color: #fff;">MARKET ARABASI TAKİP SİSTEMİ</span>
-      <button id="logout-btn" style="position: absolute; top: 10px; right: 0; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">Çıkış Yap</button>
+      <button id="logoutTrigger" class="logout-btn" aria-haspopup="dialog" aria-controls="logoutDialog" style="position: absolute; top: 10px; right: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M16 17l5-5-5-5" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12H9" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 19H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Çıkış Yap
+      </button>
       <button id="logout-btn" style="position: absolute; top: 10px; right: 0; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">Çıkış Yap</button>
     </div>
   </header>
   <main>
+  <!-- Modal / Dialog -->
+  <div id="overlay" class="overlay" role="presentation">
+    <div id="logoutDialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" tabindex="-1">
+      <div class="titlebar">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><rect rx='4' width='20' height='20' fill='%23ee7624'/><text x='50%' y='55%' fill='white' font-size='12' font-family='Segoe UI' text-anchor='middle' dominant-baseline='middle'>i</text></svg>" alt="">
+        <div id="dialogTitle" class="title">Migros Güvenlik Uyarısı</div>
+      </div>
+      <div class="dialog-body">
+        <div class="icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 9v4" stroke="#cc7a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 17h.01" stroke="#cc7a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.73 3h16.9a2 2 0 0 0 1.73-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#cc7a00" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p style="font-weight:700; margin-bottom:6px;">Çıkış yapmak istiyor musunuz?</p>
+          <p style="color:#444; margin-top:0;">İşlemi onaylıyor musunuz? Bu işlem oturumunuzu sonlandıracaktır.</p>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancelBtn" class="btn" type="button">Hayır</button>
+        <button id="confirmBtn" class="btn primary" type="button">Evet</button>
+      </div>
+    </div>
+  </div>
     <div id="store-map"></div>
     <div style="display: flex; flex-direction: column; gap: 2rem;">
       <div id="controls">
@@ -250,6 +381,55 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+  <script>
+    (function(){
+      const logoutTrigger = document.getElementById('logoutTrigger');
+      const overlay = document.getElementById('overlay');
+      const dialog = document.getElementById('logoutDialog');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const confirmBtn = document.getElementById('confirmBtn');
+      let lastFocused = null;
+      function openDialog(){
+        lastFocused = document.activeElement;
+        overlay.classList.add('show');
+        setTimeout(()=> dialog.focus(), 10);
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', handleKeydown);
+      }
+      function closeDialog(){
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', handleKeydown);
+        if(lastFocused) lastFocused.focus();
+      }
+      function handleKeydown(e){
+        if(e.key === 'Escape'){ closeDialog(); }
+        if(e.key === 'Enter' && document.activeElement !== cancelBtn){
+          if(overlay.classList.contains('show')) { doLogout(); }
+        }
+      }
+      function doLogout(){
+        window.location.href = 'giris.html';
+      }
+      logoutTrigger.addEventListener('click', openDialog);
+      cancelBtn.addEventListener('click', closeDialog);
+      confirmBtn.addEventListener('click', doLogout);
+      overlay.addEventListener('click', function(e){
+        if(e.target === overlay) closeDialog();
+      });
+      dialog.addEventListener('keydown', function(e){
+        if(e.key !== 'Tab') return;
+        const focusable = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if(e.shiftKey){
+          if(document.activeElement === first){ e.preventDefault(); last.focus(); }
+        } else {
+          if(document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      });
+    })();
+  </script>
   <script>
     // Çıkış butonu fonksiyonu
     document.addEventListener('DOMContentLoaded', function() {
