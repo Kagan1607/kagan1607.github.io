@@ -173,11 +173,13 @@
 </head>
 <body>
   <header>
-  <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+  <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; position: relative;">
       <svg width="260" height="60" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
         <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text>
       </svg>
       <span style="font-size: 2.1rem; font-weight: bold; letter-spacing: 1px; color: #fff;">MARKET ARABASI TAKİP SİSTEMİ</span>
+      <button id="logout-btn" style="position: absolute; top: 10px; right: 0; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">Çıkış Yap</button>
+      <button id="logout-btn" style="position: absolute; top: 10px; right: 0; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">Çıkış Yap</button>
     </div>
   </header>
   <main>
@@ -191,63 +193,147 @@
       <div id="cart-list-panel">
         <div class="cart-list-title">Takip Edilen Market Arabaları</div>
         <div class="cart-list-scroll">
-          <!-- Market Arabası 01-50 -->
-          <div class="cart-list-item connected">Market Arabası 01 <img src='yesil.jpg' alt='Bağlı' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item connected">Market Arabası 02 <img src='yesil.jpg' alt='Bağlı' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item connected">Market Arabası 03 <img src='yesil.jpg' alt='Bağlı' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 04 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 05 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 06 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 07 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 08 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 09 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 10 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 11 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 12 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 13 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 14 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 15 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 16 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 17 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 18 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 19 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 20 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 21 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 22 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 23 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 24 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 25 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 26 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 27 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 28 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 29 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 30 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 31 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 32 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 33 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 34 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 35 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 36 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 37 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 38 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 39 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 40 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 41 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 42 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 43 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 44 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 45 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 46 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 47 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 48 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 49 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
-          <div class="cart-list-item">Market Arabası 50 <img src='kirmizi.jpg' alt='Bağlı değil' style='height:20px;vertical-align:middle;margin-left:8px;'></div>
+          <!-- Market Arabası görselleri kaldırıldı. Bağlı/bağlı değil durumu için resimler JS ile eklenecek. -->
         </div>
       </div>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+  <script>
+    // Çıkış butonu fonksiyonu
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = function() {
+          // Önce varsa eski popup'ı kaldır
+          const oldPopup = document.getElementById('logout-popup');
+          if (oldPopup) oldPopup.remove();
+          // Popup oluştur
+          const popup = document.createElement('div');
+          popup.id = 'logout-popup';
+          popup.style.position = 'fixed';
+          popup.style.top = '0';
+          popup.style.left = '0';
+          popup.style.width = '100vw';
+          popup.style.height = '100vh';
+          popup.style.background = 'rgba(0,0,0,0.25)';
+          popup.style.display = 'flex';
+          popup.style.alignItems = 'center';
+          popup.style.justifyContent = 'center';
+          popup.style.zIndex = '9999';
+          const content = document.createElement('div');
+          content.style.background = '#fff';
+          content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+          content.style.borderRadius = '16px';
+          content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+          content.style.display = 'flex';
+          content.style.flexDirection = 'column';
+          content.style.alignItems = 'center';
+          content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Çıkış yapmak istediğinize emin misiniz?</div>`;
+          const btnYes = document.createElement('button');
+          btnYes.textContent = 'Evet';
+          btnYes.style.background = '#d32f2f';
+          btnYes.style.color = '#fff';
+          btnYes.style.fontWeight = 'bold';
+          btnYes.style.fontSize = '1.1rem';
+          btnYes.style.border = 'none';
+          btnYes.style.borderRadius = '7px';
+          btnYes.style.padding = '0.7rem 2.5rem';
+          btnYes.style.cursor = 'pointer';
+          btnYes.style.marginTop = '0.5rem';
+          btnYes.onclick = function() {
+            window.location.href = 'giris.html';
+          };
+          const btnNo = document.createElement('button');
+          btnNo.textContent = 'Hayır';
+          btnNo.style.background = '#ee7624';
+          btnNo.style.color = '#fff';
+          btnNo.style.fontWeight = 'bold';
+          btnNo.style.fontSize = '1.1rem';
+          btnNo.style.border = 'none';
+          btnNo.style.borderRadius = '7px';
+          btnNo.style.padding = '0.7rem 2.5rem';
+          btnNo.style.cursor = 'pointer';
+          btnNo.style.marginTop = '0.5rem';
+          btnNo.onclick = function() {
+            popup.remove();
+          };
+          content.appendChild(btnYes);
+          content.appendChild(btnNo);
+          popup.appendChild(content);
+          document.body.appendChild(popup);
+        };
+      }
+    });
+  </script>
+  <script>
+    // Çıkış butonu fonksiyonu
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = function() {
+          // Önce varsa eski popup'ı kaldır
+          const oldPopup = document.getElementById('logout-popup');
+          if (oldPopup) oldPopup.remove();
+          // Popup oluştur
+          const popup = document.createElement('div');
+          popup.id = 'logout-popup';
+          popup.style.position = 'fixed';
+          popup.style.top = '0';
+          popup.style.left = '0';
+          popup.style.width = '100vw';
+          popup.style.height = '100vh';
+          popup.style.background = 'rgba(0,0,0,0.25)';
+          popup.style.display = 'flex';
+          popup.style.alignItems = 'center';
+          popup.style.justifyContent = 'center';
+          popup.style.zIndex = '9999';
+          const content = document.createElement('div');
+          content.style.background = '#fff';
+          content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+          content.style.borderRadius = '16px';
+          content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+          content.style.display = 'flex';
+          content.style.flexDirection = 'column';
+          content.style.alignItems = 'center';
+          content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Çıkış yapmak istediğinize emin misiniz?</div>`;
+          const btnYes = document.createElement('button');
+          btnYes.textContent = 'Evet';
+          btnYes.style.background = '#d32f2f';
+          btnYes.style.color = '#fff';
+          btnYes.style.fontWeight = 'bold';
+          btnYes.style.fontSize = '1.1rem';
+          btnYes.style.border = 'none';
+          btnYes.style.borderRadius = '7px';
+          btnYes.style.padding = '0.7rem 2.5rem';
+          btnYes.style.cursor = 'pointer';
+          btnYes.style.marginTop = '0.5rem';
+          btnYes.onclick = function() {
+            window.location.href = 'giris.html';
+          };
+          const btnNo = document.createElement('button');
+          btnNo.textContent = 'Hayır';
+          btnNo.style.background = '#ee7624';
+          btnNo.style.color = '#fff';
+          btnNo.style.fontWeight = 'bold';
+          btnNo.style.fontSize = '1.1rem';
+          btnNo.style.border = 'none';
+          btnNo.style.borderRadius = '7px';
+          btnNo.style.padding = '0.7rem 2.5rem';
+          btnNo.style.cursor = 'pointer';
+          btnNo.style.marginTop = '0.5rem';
+          btnNo.onclick = function() {
+            popup.remove();
+          };
+          content.appendChild(btnYes);
+          content.appendChild(btnNo);
+          popup.appendChild(content);
+          document.body.appendChild(popup);
+        };
+      }
+    });
+  </script>
   <script>
     const storeMap = document.getElementById('store-map');
 
@@ -369,31 +455,27 @@
     const cartListItems = [];
     let connectedCarts = [];
     for(let i=1; i<=cartCount; i++) {
-      const item = document.createElement('div');
-      item.className = 'cart-list-item';
-      item.style.display = 'flex';
-      item.style.alignItems = 'center';
-      item.style.justifyContent = 'space-between';
-      // Sol bağlantı ikonu (küçük daire)
-      const icon = document.createElement('span');
-      icon.className = 'cart-status-icon disconnected';
-      icon.title = 'Bağlı değil';
-      item.appendChild(icon);
-      // Metin
-      const label = document.createElement('span');
-      label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
-      label.style.flex = '1';
-      label.style.marginLeft = '8px';
-      item.appendChild(label);
-      // Sağ zincir iconu (SVG olarak)
-      const chain = document.createElement('span');
-      chain.className = 'cart-chain-icon disconnected';
-      chain.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.657 6.343a6 6 0 0 1 0 8.485l-3.535 3.535a6 6 0 0 1-8.485-8.485l1.414-1.414" stroke="#f44336" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.343 17.657a6 6 0 0 1 0-8.485l3.535-3.535a6 6 0 0 1 8.485 8.485l-1.414 1.414" stroke="#f44336" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      chain.style.marginLeft = 'auto';
-      item.appendChild(chain);
-      item.dataset.cartIndex = i-1;
-      cartListScroll.appendChild(item);
-      cartListItems.push(item);
+  const item = document.createElement('div');
+  item.className = 'cart-list-item';
+  item.style.display = 'flex';
+  item.style.alignItems = 'center';
+  item.style.justifyContent = 'space-between';
+  // Sol bağlantı ikonu (küçük daire)
+  const icon = document.createElement('span');
+  icon.className = 'cart-status-icon disconnected';
+  icon.title = 'Bağlı değil';
+  item.appendChild(icon);
+  // Metin
+  const label = document.createElement('span');
+  label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+  label.style.flex = '1';
+  label.style.marginLeft = '8px';
+  item.appendChild(label);
+  // Bağlı/bağlı değil görseli kaldırıldı. Sadece arka plan ve metin olacak.
+  // Zincir simgesi kaldırıldı.
+  item.dataset.cartIndex = i-1;
+  cartListScroll.appendChild(item);
+  cartListItems.push(item);
     }
 
     // Popup fonksiyonu
@@ -401,30 +483,20 @@
       // Popup zaten varsa kaldır
       const oldPopup = document.getElementById('cart-list-popup');
       if (oldPopup) oldPopup.remove();
-      const popup = document.createElement('div');
-      popup.className = 'cart-list-popup';
-      popup.id = 'cart-list-popup';
-      const content = document.createElement('div');
-      content.className = 'cart-list-popup-content';
-      if (connectedCarts[index]) {
-        content.innerHTML = `<div class='popup-title'>${cartListItems[index].textContent}</div>`;
-        const btnHeat = document.createElement('button');
-        btnHeat.textContent = 'Isı Haritası';
-        btnHeat.onclick = () => { alert('Isı Haritası özelliği açılacak!'); };
-        const btnRoute = document.createElement('button');
-        btnRoute.textContent = 'Güzergah';
-        btnRoute.onclick = () => { alert('Güzergah özelliği açılacak!'); };
-        content.appendChild(btnHeat);
-        content.appendChild(btnRoute);
-      } else {
-        content.innerHTML = `<div class='popup-warning'>Böyle Bir Market Arabası Bulunamadı</div>`;
-      }
-      const btnClose = document.createElement('button');
-      btnClose.textContent = 'Kapat';
-      btnClose.onclick = () => popup.remove();
-      content.appendChild(btnClose);
-      popup.appendChild(content);
-      document.body.appendChild(popup);
+      const item = document.createElement('div');
+      item.className = 'cart-list-item';
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.justifyContent = 'center';
+      // Sadece metin
+      const label = document.createElement('span');
+      label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+      label.style.flex = '1';
+      label.style.marginLeft = '8px';
+      item.appendChild(label);
+      item.dataset.cartIndex = i-1;
+      cartListScroll.appendChild(item);
+      cartListItems.push(item);
     }
 
     // Tıklanabilirlik
@@ -471,6 +543,12 @@
             icon.classList.remove('disconnected');
             icon.classList.add('connected');
             icon.title = 'Bağlı';
+          }
+          // Durum görselini güncelle
+          const statusImg = cartListItems[nextCartIndex].querySelector('img');
+          if (statusImg) {
+            statusImg.src = 'yesil.png';
+            statusImg.alt = 'Bağlı';
           }
           // Zincir ikonunu güncelle
           const chain = cartListItems[nextCartIndex].querySelector('.cart-chain-icon');
