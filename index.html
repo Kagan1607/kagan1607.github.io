@@ -103,7 +103,7 @@ let simRunning = false;
 let followMode = false;
 let heatmapVisible = false;
 
-// REYONLAR
+// REYONLAR (Labirent gibi yerleştirilmiş)
 const shelves = [
   { x: 50, y: 30, w: 100, h: 30, label: 'Kahvaltılık' },
   { x: 180, y: 50, w: 120, h: 30, label: 'Atıştırmalık' },
@@ -115,6 +115,18 @@ const shelves = [
   { x: 220, y: 240, w: 150, h: 30, label: 'Kampanyalar' },
   { x: 400, y: 250, w: 120, h: 30, label: 'Depo' }
 ];
+
+// LABİRENT KORİDOR ALANLARI
+const corridors = [
+  {x:0,y:0,w:180,h:360},
+  {x:180,y:0,w:140,h:200},
+  {x:180,y:200,w:140,h:160},
+  {x:320,y:0,w:200,h:360}
+];
+
+function isInsideCorridor(x,y){
+  return corridors.some(c=> x>=c.x && x<=c.x+c.w-40 && y>=c.y && y<=c.y+c.h-40 );
+}
 
 function renderShelves(){
   shelves.forEach(s=>{
@@ -130,25 +142,12 @@ function renderShelves(){
 }
 renderShelves();
 
-// KORİDOR TANIMI
-const corridors = [
-  {x:0,y:0,w:180,h:360},
-  {x:180,y:0,w:140,h:200},
-  {x:180,y:200,w:140,h:160},
-  {x:320,y:0,w:200,h:360}
-];
-
-function isInsideCorridor(x,y){
-  return corridors.some(c=> x>=c.x && x<=c.x+c.w-40 && y>=c.y && y<=c.y+c.h-40 );
-}
-
-// MARKET ARABALARI
 function getRandomNonOverlapping(existing,size=48){
   let attempts=0;
-  while(attempts++<200){
+  while(attempts++<500){
     const x = 20 + Math.random()*(storeMap.offsetWidth - 60);
     const y = 20 + Math.random()*(storeMap.offsetHeight - 60);
-    if(!existing.some(e=>Math.hypot(x-e.x,y-e.y)<size)) return {x,y};
+    if(!existing.some(e=>Math.hypot(x-e.x,y-e.y)<size) && isInsideCorridor(x,y)) return {x,y};
   }
   return {x:20,y:20};
 }
@@ -167,8 +166,8 @@ function createMapCarts(){
     storeMap.appendChild(el);
     mapCarts.push({
       index:i, el, x:pos.x, y:pos.y,
-      vx:(Math.random()-0.5)*1.4,
-      vy:(Math.random()-0.5)*1.4
+      vx:(Math.random()-0.5)*1.2,
+      vy:(Math.random()-0.5)*1.2
     });
   }
 }
@@ -215,27 +214,23 @@ function renderCartList(){
 }
 renderCartList();
 
-// GÜNCELLEME & HAREKET
 function updateCarts(){
   mapCarts.forEach(c=>{
     c.x += c.vx;
     c.y += c.vy;
 
-    // Koridor kontrolü
     if(!isInsideCorridor(c.x,c.y)){
-      if(Math.random()<0.5) c.vx*=-1; else c.vy*=-1;
+      c.vx*=-1; c.vy*=-1;
       c.x = Math.max(0, Math.min(storeMap.offsetWidth-40, c.x));
       c.y = Math.max(0, Math.min(storeMap.offsetHeight-40, c.y));
     }
 
-    // Reyon çarpması
     shelves.forEach(s=>{
-      if(c.x+40 > s.x && c.x < s.x + s.w && c.y+40 > s.y && c.y < s.y + s.h){
+      if(c.x+40 > s.x && c.x < s.x+s.w && c.y+40 > s.y && c.y < s.y+s.h){
         if(Math.random()<0.5) c.vx*=-1; else c.vy*=-1;
       }
     });
 
-    // Duvar çarpması
     if(c.x<0 || c.x>storeMap.offsetWidth-40) c.vx*=-1;
     if(c.y<0 || c.y>storeMap.offsetHeight-40) c.vy*=-1;
 
@@ -249,7 +244,6 @@ function updateCarts(){
   }
 }
 
-// SIMULASYON & TAKİP
 let simInterval;
 simToggleBtn.addEventListener('click',()=>{
   simRunning=!simRunning;
@@ -283,5 +277,3 @@ heatToggleBtn.addEventListener('click',()=>{
   }
 });
 </script>
-</body>
-</html>
