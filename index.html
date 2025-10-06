@@ -312,33 +312,7 @@
     </div>
   </header>
   <main>
-  <!-- Sol üst: Konum kartı -->
-  <div class="loc-card" role="region" aria-label="Market konumu">
-    <div class="loc-header">
-      <h4>Market Konumu</h4>
-      <div style="flex:1"></div>
-      <small class="small">Sol üst</small>
-    </div>
-    <div class="loc-actions">
-      <button id="btnShareLoc" class="btn">Konumumu Paylaş</button>
-      <button id="btnCenterMarket" class="btn primary">Marketi Göster</button>
-    </div>
-    <div id="locStatus" class="loc-status muted">Konum alınmadı.</div>
-    <div style="margin-bottom:8px;">
-      <label class="small">Market koordinatları (enlem, boylam)</label>
-      <div class="row" style="margin-top:6px; display:flex; gap:8px;">
-        <input id="marketLat" type="text" placeholder="Enlem (ör: 41.005)" value="">
-        <input id="marketLng" type="text" placeholder="Boylam (ör: 28.976)" value="">
-      </div>
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        <button id="btnSetMarket" class="btn">Kaydet</button>
-        <button id="btnDirections" class="btn">Yol Tarifi</button>
-      </div>
-      <div style="margin-top:8px;"><span class="small">İzin vermiyorsan koordinat gir veya "Marketi Göster"e bas.</span></div>
-    </div>
-  </div>
-  <!-- Harita -->
-  <div id="map" aria-hidden="false"></div>
+  <!-- ...existing code... -->
   <!-- Modal / Dialog -->
   <div id="overlay" class="overlay" role="presentation">
     <div id="logoutDialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" tabindex="-1">
@@ -432,113 +406,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
-  <!-- Leaflet JS (CDN) -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script>
-    (function(){
-      // ---------- LOGOUT DIALOG ----------
-      const logoutTrigger = document.getElementById('logoutTrigger');
-      const overlay = document.getElementById('overlay');
-      const dialog = document.getElementById('logoutDialog');
-      const cancelBtn = document.getElementById('cancelBtn');
-      const confirmBtn = document.getElementById('confirmBtn');
-      let lastFocused = null;
-      function openDialog(){ lastFocused = document.activeElement; overlay.classList.add('show'); setTimeout(()=> dialog.focus(),10); document.body.style.overflow='hidden'; document.addEventListener('keydown', handleKeydown); }
-      function closeDialog(){ overlay.classList.remove('show'); document.body.style.overflow=''; document.removeEventListener('keydown', handleKeydown); if(lastFocused) lastFocused.focus(); }
-      function handleKeydown(e){ if(e.key==='Escape') closeDialog(); if(e.key==='Enter' && document.activeElement !== cancelBtn){ if(overlay.classList.contains('show')) doLogout(); } }
-      function doLogout(){ window.location.href = 'giris.html'; }
-      logoutTrigger.addEventListener('click', openDialog);
-      cancelBtn.addEventListener('click', closeDialog);
-      confirmBtn.addEventListener('click', doLogout);
-      overlay.addEventListener('click', function(e){ if(e.target === overlay) closeDialog(); });
-      dialog.addEventListener('keydown', function(e){
-        if(e.key !== 'Tab') return;
-        const focusable = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if(e.shiftKey){ if(document.activeElement === first){ e.preventDefault(); last.focus(); } }
-        else { if(document.activeElement === last){ e.preventDefault(); first.focus(); } }
-      });
-      // ---------- MAP & LOCATION ----------
-      const DEFAULT_MARKET_COORDS = { lat: 41.015137, lng: 28.979530 };
-      const locStatus = document.getElementById('locStatus');
-      const btnShareLoc = document.getElementById('btnShareLoc');
-      const btnCenterMarket = document.getElementById('btnCenterMarket');
-      const btnSetMarket = document.getElementById('btnSetMarket');
-      const btnDirections = document.getElementById('btnDirections');
-      const marketLatInput = document.getElementById('marketLat');
-      const marketLngInput = document.getElementById('marketLng');
-      const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([DEFAULT_MARKET_COORDS.lat, DEFAULT_MARKET_COORDS.lng], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-      let userMarker = null;
-      let marketMarker = L.marker([DEFAULT_MARKET_COORDS.lat, DEFAULT_MARKET_COORDS.lng], { title:'Market', riseOnHover:true }).addTo(map);
-      marketLatInput.value = DEFAULT_MARKET_COORDS.lat;
-      marketLngInput.value = DEFAULT_MARKET_COORDS.lng;
-      async function requestUserLocation(){
-        if(!navigator.geolocation){ locStatus.textContent = 'Tarayıcı konum desteklemiyor.'; return; }
-        locStatus.textContent = 'Konum isteniyor — lütfen tarayıcı izin isteğini kabul edin.';
-        navigator.geolocation.getCurrentPosition(function(pos){
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          locStatus.textContent = `Konum alındı: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-          if(userMarker) userMarker.setLatLng([lat,lng]);
-          else userMarker = L.marker([lat,lng], { title:'Sizin Konumunuz', riseOnHover:true }).addTo(map);
-          map.setView([lat,lng], 15);
-        }, function(err){ locStatus.textContent = 'Konum alınamadı: ' + (err.message || 'izin reddedildi'); }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
-      }
-      btnShareLoc.addEventListener('click', function(){ requestUserLocation(); });
-      btnCenterMarket.addEventListener('click', function(){
-        const lat = parseFloat(marketLatInput.value) || DEFAULT_MARKET_COORDS.lat;
-        const lng = parseFloat(marketLngInput.value) || DEFAULT_MARKET_COORDS.lng;
-        marketMarker.setLatLng([lat,lng]).addTo(map);
-        map.setView([lat,lng], 17);
-        locStatus.textContent = `Market konumu gösteriliyor: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-      });
-      btnSetMarket.addEventListener('click', function(){
-        const lat = parseFloat(marketLatInput.value);
-        const lng = parseFloat(marketLngInput.value);
-        if(isNaN(lat) || isNaN(lng)){ alert('Lütfen geçerli enlem ve boylam girin (ör: 41.005, 28.976).'); return; }
-        marketMarker.setLatLng([lat,lng]).addTo(map);
-        map.setView([lat,lng], 17);
-        locStatus.textContent = `Market kaydedildi: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-      });
-      btnDirections.addEventListener('click', function(){
-        let origin = '';
-        if(userMarker){ const p = userMarker.getLatLng(); origin = `${p.lat},${p.lng}`; }
-        const lat = parseFloat(marketLatInput.value) || DEFAULT_MARKET_COORDS.lat;
-        const lng = parseFloat(marketLngInput.value) || DEFAULT_MARKET_COORDS.lng;
-        const destination = `${lat},${lng}`;
-        let url = '';
-        if(origin) url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-        else url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
-        window.open(url, '_blank');
-      });
-      map.on('click', function(e){
-        const c = e.latlng;
-        locStatus.textContent = `Haritadan seçildi: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)} — Kaydetmek için "Kaydet"e bas.`;
-        marketLatInput.value = c.lat.toFixed(6);
-        marketLngInput.value = c.lng.toFixed(6);
-      });
-      marketMarker.addTo(map);
-      try {
-        const stored = localStorage.getItem('market_coords_v1');
-        if(stored){
-          const o = JSON.parse(stored);
-          if(o.lat && o.lng){
-            marketLatInput.value = o.lat;
-            marketLngInput.value = o.lng;
-            marketMarker.setLatLng([o.lat,o.lng]);
-          }
-        }
-      } catch(e){}
-      btnSetMarket.addEventListener('click', function(){
-        try {
-          const o = { lat: parseFloat(marketLatInput.value), lng: parseFloat(marketLngInput.value) };
-          localStorage.setItem('market_coords_v1', JSON.stringify(o));
-        } catch(e){}
-      });
-    })();
-  </script>
+  <!-- ...existing code... -->
   <script>
     (function(){
       const logoutTrigger = document.getElementById('logoutTrigger');
