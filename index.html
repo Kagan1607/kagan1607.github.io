@@ -1,57 +1,600 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+  <!-- Leaflet CSS (CDN) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Migros Market Arabası Takip Sistemi</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-    header { background: #ee7624; color: white; text-align: center; padding: 1rem; position: relative; display: flex; align-items: center; justify-content: center; gap: 1rem; }
-    header h1 { margin: 0; font-size: 1.8rem; font-weight: bold; }
-    header button { position: absolute; top: 10px; right: 10px; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1rem; border: none; border-radius: 6px; padding: 0.5rem 1rem; cursor: pointer; }
-    main { display: flex; flex-direction: row; gap: 2rem; padding: 1rem; height: calc(100vh - 70px); box-sizing: border-box; }
-    #store-map { position: relative; width: 1000px; height: 600px; background: #fff; border: 2px solid #ccc; border-radius: 12px; overflow: hidden; }
-    .shelf { position: absolute; background: #ffe0b2; border: 2px solid #ee7624; border-radius: 8px; z-index: 1; }
-    .cart { position: absolute; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; z-index: 2; }
-    #controls { display: flex; flex-direction: column; gap: 1rem; background: #fff3e0; border: 2px solid #ee7624; border-radius: 12px; padding: 1.5rem; min-width: 200px; }
-    #controls button { padding: 0.7rem; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; background: #ee7624; color: #fff; font-weight: bold; transition: 0.2s; }
-    #controls button:hover { background: #d65d0e; }
-    #cart-list-panel { background: #fff3e0; border: 2px solid #ee7624; border-radius: 12px; min-width: 200px; max-width: 260px; height: 500px; display: flex; flex-direction: column; }
-    .cart-list-title { font-size: 1.1rem; font-weight: bold; color: #ee7624; background: #fff; border-radius: 12px 12px 0 0; padding: 0.8rem; text-align: center; border-bottom: 1.5px solid #ee7624; }
-    .cart-list-scroll { flex: 1; overflow-y: auto; padding: 0.5rem; background: #fff3e0; border-radius: 0 0 12px 12px; }
-    .cart-list-item { font-size: 1rem; color: #333; background: #fff; border-radius: 6px; margin-bottom: 0.5rem; padding: 0.5rem 0.8rem; border: 1px solid #ee7624; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-    .cart-list-item.connected { background: #ee7624; color: #fff; font-weight: bold; }
-    /* Popup styles */
-    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-    .popup-content { background: #fff; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 32px rgba(0,0,0,0.13); display: flex; flex-direction: column; align-items: center; gap: 1rem; min-width: 280px; }
-    .popup-content button { width: 100%; padding: 0.7rem; border-radius: 7px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
-    .popup-content .btn-yes { background: #d32f2f; color: #fff; }
-    .popup-content .btn-no { background: #ee7624; color: #fff; }
+    /* Konum kartı ve harita stilleri */
+    .loc-card {
+      position:fixed;
+      top:16px;
+      left:16px;
+      width:320px;
+      max-width:calc(100% - 32px);
+      background:rgba(255,255,255,0.98);
+      border-radius:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      padding:12px;
+      z-index:1500;
+      font-size:14px;
+    }
+    .loc-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .loc-header h4 { margin:0; font-size:15px; }
+    .loc-actions { display:flex; gap:8px; margin-bottom:8px; }
+    .btn { padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); cursor:pointer; background:#fff; font-weight:600; font-size:13px; }
+    .btn.primary { background:#ee7624; color:#fff; border-color:rgba(0,0,0,0.08); }
+    .loc-status { font-size:13px; color:#444; margin-bottom:8px; }
+    #map { position:fixed; top:80px; left:16px; width:360px; height:360px; max-width:calc(100% - 32px); z-index:1400; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; }
+    @media (max-width:420px){ #map { width:92%; height:280px; top:72px; left:4%; } .loc-card { width:92%; left:4%; } }
+    /* Çıkış modalı ve butonu için ek stiller */
+    .logout-btn{
+      cursor:pointer;
+      background:transparent;
+      border:1px solid transparent;
+      padding:10px 14px;
+      border-radius:6px;
+      font-weight:600;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+    }
+    .logout-btn:hover{
+      background:rgba(0,0,0,0.04);
+    }
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.35);
+      z-index:2000;
+      padding:20px;
+    }
+    .overlay.show{display:flex;}
+    .dialog{
+      width:420px;
+      max-width:100%;
+      background:#fff;
+      border-radius:8px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      overflow:hidden;
+      outline: none;
+    }
+    .titlebar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      background:linear-gradient(180deg, #f3f6fa, #e9eef6);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+    }
+    .titlebar img{
+      width:20px;height:20px;
+    }
+    .titlebar .title{
+      font-weight:700;
+      font-size:14px;
+      flex:1;
+    }
+    .dialog-body{
+      display:flex;
+      gap:14px;
+      padding:18px 16px;
+      align-items:flex-start;
+    }
+    .dialog-body .icon{
+      width:44px;height:44px;
+      flex:0 0 44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:6px;
+      background:linear-gradient(180deg,#fff,#f6fbff);
+      border:1px solid rgba(0,0,0,0.04);
+    }
+    .dialog-body p{
+      margin:0;
+      font-size:15px;
+      line-height:1.4;
+    }
+    .dialog-footer{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      padding:12px 16px;
+      border-top:1px solid rgba(0,0,0,0.04);
+      background: #fbfcfe;
+    }
+    button.btn{
+      min-width:88px;
+      padding:8px 12px;
+      border-radius:6px;
+      border:1px solid rgba(0,0,0,0.08);
+      font-weight:600;
+      cursor:pointer;
+      background:#fff;
+    }
+    button.primary{
+      background:#ee7624;
+      color:white;
+      border-color:rgba(0,0,0,0.08);
+    }
+    button:focus{
+      outline:3px solid rgba(0,120,215,0.18);
+      outline-offset:2px;
+    }
+    body { font-family: Arial; margin: 0; padding: 0; background: #f0f0f0; }
+  header { background: #ee7624; color: white; text-align: center; padding: 1rem; }
+    main {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0;
+      gap: 2rem;
+      height: calc(100vh - 70px);
+      min-height: 600px;
+    }
+    #store-map {
+      position: relative;
+      width: 1400px;
+      height: calc(100vh - 70px);
+      min-height: 600px;
+      border: 2px solid #ccc;
+      background-color: #fff;
+      margin-top: 0;
+      margin-left: 0;
+      box-sizing: border-box;
+    }
+    .cart {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .shelf {
+      position: absolute;
+      background: #ffe0b2;
+      border: 2px solid #ee7624;
+      border-radius: 8px;
+      z-index: 1;
+    }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #fff3e0;
+      border: 2px solid #ee7624;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+      min-width: 220px;
+      align-items: stretch;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    button {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #ee7624;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #d65d0e;
+    }
+    #cart-list-panel {
+      background: #fff3e0;
+      border: 2px solid #ee7624;
+      border-radius: 12px;
+      min-width: 220px;
+      max-width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      height: 500px;
+    }
+    .cart-list-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ee7624;
+      background: #fff;
+      border-radius: 12px 12px 0 0;
+      padding: 1rem 1rem 0.7rem 1rem;
+      text-align: center;
+      border-bottom: 1.5px solid #ee7624;
+    }
+    .cart-list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.7rem 1rem 1rem 1rem;
+      background: #fff3e0;
+      border-radius: 0 0 12px 12px;
+    }
+    .cart-list-item {
+      font-size: 1rem;
+      color: #333;
+      background: #fff;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid #ee7624;
+      font-weight: 500;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      cursor: pointer;
+    }
+    .cart-list-item.connected {
+      background: #ee7624;
+      color: #fff;
+      border: 2px solid #ee7624;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cart-list-popup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .cart-list-popup-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      min-width: 260px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .cart-list-popup-content button {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.7rem 0;
+      font-size: 1rem;
+      border-radius: 7px;
+      border: none;
+      background: #ee7624;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cart-list-popup-content button:hover {
+      background: #d65d0e;
+    }
+    .cart-list-popup-content .popup-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ee7624;
+      margin-bottom: 0.5rem;
+    }
+    .cart-list-popup-content .popup-warning {
+      color: #d32f2f;
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Migros Market Arabası Takip Sistemi</h1>
-    <button id="logout-btn">Çıkış Yap</button>
+  <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; position: relative;">
+      <svg width="260" height="60" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="95" font-family="Arial Black, Arial, sans-serif" font-size="100" font-weight="bold" fill="#fff">MiGROS</text>
+      </svg>
+      <span style="font-size: 2.1rem; font-weight: bold; letter-spacing: 1px; color: #fff;">MARKET ARABASI TAKİP SİSTEMİ</span>
+      <button id="logoutTrigger" class="logout-btn" aria-haspopup="dialog" aria-controls="logoutDialog" style="position: absolute; top: 10px; right: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M16 17l5-5-5-5" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12H9" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 19H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Çıkış Yap
+      </button>
+      <button id="logout-btn" style="position: absolute; top: 10px; right: 0; background: #d32f2f; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">Çıkış Yap</button>
+    </div>
   </header>
   <main>
+  <!-- ...existing code... -->
+  <!-- Modal / Dialog -->
+  <div id="overlay" class="overlay" role="presentation">
+    <div id="logoutDialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" tabindex="-1">
+      <div class="titlebar">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><rect rx='4' width='20' height='20' fill='%23ee7624'/><text x='50%' y='55%' fill='white' font-size='12' font-family='Segoe UI' text-anchor='middle' dominant-baseline='middle'>i</text></svg>" alt="">
+        <div id="dialogTitle" class="title">Migros Güvenlik Uyarısı</div>
+      </div>
+      <div class="dialog-body">
+        <div class="icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 9v4" stroke="#cc7a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 17h.01" stroke="#cc7a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.73 3h16.9a2 2 0 0 0 1.73-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#cc7a00" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p style="font-weight:700; margin-bottom:6px;">Çıkış yapmak istiyor musunuz?</p>
+          <p style="color:#444; margin-top:0;">İşlemi onaylıyor musunuz? Bu işlem oturumunuzu sonlandıracaktır.</p>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancelBtn" class="btn" type="button">Hayır</button>
+        <button id="confirmBtn" class="btn primary" type="button">Evet</button>
+      </div>
+    </div>
+  </div>
     <div id="store-map"></div>
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
       <div id="controls">
-        <button id="toggle-sim">Simülasyonu Aç/Kapa</button>
-        <button id="toggle-heatmap">Isı Haritasını Göster/Gizle</button>
         <button id="connect-btn">BLE Cihazına Bağlan</button>
+        <button id="toggle-sim">Takibi Aç/Kapa</button>
+        <button id="toggle-heatmap">Isı Haritasını Göster</button>
       </div>
       <div id="cart-list-panel">
         <div class="cart-list-title">Takip Edilen Market Arabaları</div>
-        <div class="cart-list-scroll" id="cart-list-scroll"></div>
+        <div class="cart-list-scroll">
+          <!-- Market Arabası 01-50 doğrudan HTML ile eklendi -->
+          <div class="cart-list-item">Market Arabası 01</div>
+          <div class="cart-list-item">Market Arabası 02</div>
+          <div class="cart-list-item">Market Arabası 03</div>
+          <div class="cart-list-item">Market Arabası 04</div>
+          <div class="cart-list-item">Market Arabası 05</div>
+          <div class="cart-list-item">Market Arabası 06</div>
+          <div class="cart-list-item">Market Arabası 07</div>
+          <div class="cart-list-item">Market Arabası 08</div>
+          <div class="cart-list-item">Market Arabası 09</div>
+          <div class="cart-list-item">Market Arabası 10</div>
+          <div class="cart-list-item">Market Arabası 11</div>
+          <div class="cart-list-item">Market Arabası 12</div>
+          <div class="cart-list-item">Market Arabası 13</div>
+          <div class="cart-list-item">Market Arabası 14</div>
+          <div class="cart-list-item">Market Arabası 15</div>
+          <div class="cart-list-item">Market Arabası 16</div>
+          <div class="cart-list-item">Market Arabası 17</div>
+          <div class="cart-list-item">Market Arabası 18</div>
+          <div class="cart-list-item">Market Arabası 19</div>
+          <div class="cart-list-item">Market Arabası 20</div>
+          <div class="cart-list-item">Market Arabası 21</div>
+          <div class="cart-list-item">Market Arabası 22</div>
+          <div class="cart-list-item">Market Arabası 23</div>
+          <div class="cart-list-item">Market Arabası 24</div>
+          <div class="cart-list-item">Market Arabası 25</div>
+          <div class="cart-list-item">Market Arabası 26</div>
+          <div class="cart-list-item">Market Arabası 27</div>
+          <div class="cart-list-item">Market Arabası 28</div>
+          <div class="cart-list-item">Market Arabası 29</div>
+          <div class="cart-list-item">Market Arabası 30</div>
+          <div class="cart-list-item">Market Arabası 31</div>
+          <div class="cart-list-item">Market Arabası 32</div>
+          <div class="cart-list-item">Market Arabası 33</div>
+          <div class="cart-list-item">Market Arabası 34</div>
+          <div class="cart-list-item">Market Arabası 35</div>
+          <div class="cart-list-item">Market Arabası 36</div>
+          <div class="cart-list-item">Market Arabası 37</div>
+          <div class="cart-list-item">Market Arabası 38</div>
+          <div class="cart-list-item">Market Arabası 39</div>
+          <div class="cart-list-item">Market Arabası 40</div>
+          <div class="cart-list-item">Market Arabası 41</div>
+          <div class="cart-list-item">Market Arabası 42</div>
+          <div class="cart-list-item">Market Arabası 43</div>
+          <div class="cart-list-item">Market Arabası 44</div>
+          <div class="cart-list-item">Market Arabası 45</div>
+          <div class="cart-list-item">Market Arabası 46</div>
+          <div class="cart-list-item">Market Arabası 47</div>
+          <div class="cart-list-item">Market Arabası 48</div>
+          <div class="cart-list-item">Market Arabası 49</div>
+          <div class="cart-list-item">Market Arabası 50</div>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+  <!-- ...existing code... -->
+  <script>
+    (function(){
+      const logoutTrigger = document.getElementById('logoutTrigger');
+      const overlay = document.getElementById('overlay');
+      const dialog = document.getElementById('logoutDialog');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const confirmBtn = document.getElementById('confirmBtn');
+      let lastFocused = null;
+      function openDialog(){
+        lastFocused = document.activeElement;
+        overlay.classList.add('show');
+        setTimeout(()=> dialog.focus(), 10);
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', handleKeydown);
+      }
+      function closeDialog(){
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', handleKeydown);
+        if(lastFocused) lastFocused.focus();
+      }
+      function handleKeydown(e){
+        if(e.key === 'Escape'){ closeDialog(); }
+        if(e.key === 'Enter' && document.activeElement !== cancelBtn){
+          if(overlay.classList.contains('show')) { doLogout(); }
+        }
+      }
+      function doLogout(){
+        window.location.href = 'giris.html';
+      }
+      logoutTrigger.addEventListener('click', openDialog);
+      cancelBtn.addEventListener('click', closeDialog);
+      confirmBtn.addEventListener('click', doLogout);
+      overlay.addEventListener('click', function(e){
+        if(e.target === overlay) closeDialog();
+      });
+      dialog.addEventListener('keydown', function(e){
+        if(e.key !== 'Tab') return;
+        const focusable = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if(e.shiftKey){
+          if(document.activeElement === first){ e.preventDefault(); last.focus(); }
+        } else {
+          if(document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      });
+    })();
+  </script>
+  <script>
+    // Çıkış butonu fonksiyonu
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = function() {
+          // Önce varsa eski popup'ı kaldır
+          const oldPopup = document.getElementById('logout-popup');
+          if (oldPopup) oldPopup.remove();
+          // Popup oluştur
+          const popup = document.createElement('div');
+          popup.id = 'logout-popup';
+          popup.style.position = 'fixed';
+          popup.style.top = '0';
+          popup.style.left = '0';
+          popup.style.width = '100vw';
+          popup.style.height = '100vh';
+          popup.style.background = 'rgba(0,0,0,0.25)';
+          popup.style.display = 'flex';
+          popup.style.alignItems = 'center';
+          popup.style.justifyContent = 'center';
+          popup.style.zIndex = '9999';
+          const content = document.createElement('div');
+          content.style.background = '#fff';
+          content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+          content.style.borderRadius = '16px';
+          content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+          content.style.display = 'flex';
+          content.style.flexDirection = 'column';
+          content.style.alignItems = 'center';
+          content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Çıkış yapmak istediğinize emin misiniz?</div>`;
+          const btnYes = document.createElement('button');
+          btnYes.textContent = 'Evet';
+          btnYes.style.background = '#d32f2f';
+          btnYes.style.color = '#fff';
+          btnYes.style.fontWeight = 'bold';
+          btnYes.style.fontSize = '1.1rem';
+          btnYes.style.border = 'none';
+          btnYes.style.borderRadius = '7px';
+          btnYes.style.padding = '0.7rem 2.5rem';
+          btnYes.style.cursor = 'pointer';
+          btnYes.style.marginTop = '0.5rem';
+          btnYes.onclick = function() {
+            window.location.href = 'giris.html';
+          };
+          const btnNo = document.createElement('button');
+          btnNo.textContent = 'Hayır';
+          btnNo.style.background = '#ee7624';
+          btnNo.style.color = '#fff';
+          btnNo.style.fontWeight = 'bold';
+          btnNo.style.fontSize = '1.1rem';
+          btnNo.style.border = 'none';
+          btnNo.style.borderRadius = '7px';
+          btnNo.style.padding = '0.7rem 2.5rem';
+          btnNo.style.cursor = 'pointer';
+          btnNo.style.marginTop = '0.5rem';
+          btnNo.onclick = function() {
+            popup.remove();
+          };
+          content.appendChild(btnYes);
+          content.appendChild(btnNo);
+          popup.appendChild(content);
+          document.body.appendChild(popup);
+        };
+      }
+    });
+  </script>
+  <script>
+    // Çıkış butonu fonksiyonu
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = function() {
+          // Önce varsa eski popup'ı kaldır
+          const oldPopup = document.getElementById('logout-popup');
+          if (oldPopup) oldPopup.remove();
+          // Popup oluştur
+          const popup = document.createElement('div');
+          popup.id = 'logout-popup';
+          popup.style.position = 'fixed';
+          popup.style.top = '0';
+          popup.style.left = '0';
+          popup.style.width = '100vw';
+          popup.style.height = '100vh';
+          popup.style.background = 'rgba(0,0,0,0.25)';
+          popup.style.display = 'flex';
+          popup.style.alignItems = 'center';
+          popup.style.justifyContent = 'center';
+          popup.style.zIndex = '9999';
+          const content = document.createElement('div');
+          content.style.background = '#fff';
+          content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+          content.style.borderRadius = '16px';
+          content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+          content.style.display = 'flex';
+          content.style.flexDirection = 'column';
+          content.style.alignItems = 'center';
+          content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Çıkış yapmak istediğinize emin misiniz?</div>`;
+          const btnYes = document.createElement('button');
+          btnYes.textContent = 'Evet';
+          btnYes.style.background = '#d32f2f';
+          btnYes.style.color = '#fff';
+          btnYes.style.fontWeight = 'bold';
+          btnYes.style.fontSize = '1.1rem';
+          btnYes.style.border = 'none';
+          btnYes.style.borderRadius = '7px';
+          btnYes.style.padding = '0.7rem 2.5rem';
+          btnYes.style.cursor = 'pointer';
+          btnYes.style.marginTop = '0.5rem';
+          btnYes.onclick = function() {
+            window.location.href = 'giris.html';
+          };
+          const btnNo = document.createElement('button');
+          btnNo.textContent = 'Hayır';
+          btnNo.style.background = '#ee7624';
+          btnNo.style.color = '#fff';
+          btnNo.style.fontWeight = 'bold';
+          btnNo.style.fontSize = '1.1rem';
+          btnNo.style.border = 'none';
+          btnNo.style.borderRadius = '7px';
+          btnNo.style.padding = '0.7rem 2.5rem';
+          btnNo.style.cursor = 'pointer';
+          btnNo.style.marginTop = '0.5rem';
+          btnNo.onclick = function() {
+            popup.remove();
+          };
+          content.appendChild(btnYes);
+          content.appendChild(btnNo);
+          popup.appendChild(content);
+          document.body.appendChild(popup);
+        };
+      }
+    });
+  </script>
   <script>
     const storeMap = document.getElementById('store-map');
+
+    // Arabalar ve konumları
+    // Reyonlar (örnek: x, y, genişlik, yükseklik)
     const shelves = [
       { x: 60, y: 60, w: 120, h: 30 },
       { x: 60, y: 120, w: 120, h: 30 },
@@ -63,85 +606,325 @@
       { x: 60, y: 320, w: 490, h: 30 },
       { x: 60, y: 420, w: 490, h: 30 },
     ];
-    let carts = Array.from({length: 10}, (_, i) => ({ id: i+1, x: 80 + i*50, y: 70 }));
 
-    let simulation = true;
-    let heatmapVisible = true;
+    let carts = [
+      { id: 1, x: 80, y: 70 },
+      { id: 2, x: 250, y: 130 },
+      { id: 3, x: 420, y: 70 },
+    ];
 
+  let simulation = true;
+  let heatmapVisible = true;
+
+    // Heatmap ayarları
     const heatmap = h337.create({
       container: storeMap,
       radius: 50,
       maxOpacity: 0.6,
       minOpacity: 0,
-      blur: 0.75
+      blur: 0.75,
     });
 
     function renderCarts() {
       storeMap.innerHTML = '';
-      shelves.forEach(s => {
-        const el = document.createElement('div');
-        el.className = 'shelf';
-        el.style.left = s.x + 'px';
-        el.style.top = s.y + 'px';
-        el.style.width = s.w + 'px';
-        el.style.height = s.h + 'px';
-        storeMap.appendChild(el);
+      // Reyonları çiz
+      shelves.forEach(shelf => {
+        const shelfEl = document.createElement('div');
+        shelfEl.classList.add('shelf');
+        shelfEl.style.left = shelf.x + 'px';
+        shelfEl.style.top = shelf.y + 'px';
+        shelfEl.style.width = shelf.w + 'px';
+        shelfEl.style.height = shelf.h + 'px';
+        storeMap.appendChild(shelfEl);
       });
-      carts.forEach(c => {
-        const el = document.createElement('div');
-        el.className = 'cart';
-        el.style.left = c.x + 'px';
-        el.style.top = c.y + 'px';
-        el.style.backgroundColor = `rgb(${Math.floor(c.x/3)},0,${255-Math.floor(c.y/2)})`;
-        el.textContent = c.id;
-        storeMap.appendChild(el);
+      // Arabaları çiz
+      carts.forEach(cart => {
+        const cartEl = document.createElement('div');
+        cartEl.classList.add('cart');
+        cartEl.style.left = cart.x + 'px';
+        cartEl.style.top = cart.y + 'px';
+        cartEl.style.backgroundColor = `rgb(${Math.floor(cart.x/3)},0,${255-Math.floor(cart.y/2)})`;
+        cartEl.textContent = cart.id;
+        storeMap.appendChild(cartEl);
       });
-      if(heatmapVisible) {
-        heatmap.setData({ max: 10, data: carts.map(c=>({x:c.x+20, y:c.y+20, value:5})) });
-        heatmap._renderer.canvas.style.display='';
-      } else { heatmap._renderer.canvas.style.display='none'; }
+      // Heatmap güncelle
+      if (heatmapVisible) {
+        heatmap.setData({
+          max: 10,
+          data: carts.map(c => ({ x: c.x + 20, y: c.y + 20, value: 5 }))
+        });
+        heatmap._renderer.canvas.style.display = '';
+      } else {
+        heatmap._renderer.canvas.style.display = 'none';
+      }
     }
 
     renderCarts();
 
     function moveCarts() {
       if(!simulation) return;
-      carts.forEach(c => {
-        c.x += Math.floor(Math.random()*11 - 5);
-        c.y += Math.floor(Math.random()*11 - 5);
-        c.x = Math.max(0, Math.min(storeMap.offsetWidth-40, c.x));
-        c.y = Math.max(0, Math.min(storeMap.offsetHeight-40, c.y));
+      carts.forEach(cart => {
+  cart.x += Math.floor(Math.random() * 11 - 5);
+  cart.y += Math.floor(Math.random() * 11 - 5);
+  cart.x = Math.max(0, Math.min(1360, cart.x));
+  cart.y = Math.max(0, Math.min(storeMap.offsetHeight - 40, cart.y));
       });
       renderCarts();
     }
 
     setInterval(moveCarts, 1000);
 
-    document.getElementById('toggle-sim').addEventListener('click', () => simulation = !simulation);
-    document.getElementById('toggle-heatmap').addEventListener('click', () => { heatmapVisible = !heatmapVisible; renderCarts(); });
+    // Simülasyonu aç/kapa
+    document.getElementById('toggle-sim').addEventListener('click', () => {
+      simulation = !simulation;
+    });
 
-    const cartListScroll = document.getElementById('cart-list-scroll');
+    // Isı haritası göster/gizle
+    document.getElementById('toggle-heatmap').addEventListener('click', () => {
+      heatmapVisible = !heatmapVisible;
+      renderCarts();
+      document.getElementById('toggle-heatmap').textContent = heatmapVisible ? 'Isı Haritasını Gizle' : 'Isı Haritasını Göster';
+    });
+
+    // BLE cihazına bağlan (Web Bluetooth API simülasyonu)
+    document.getElementById('connect-btn').addEventListener('click', async () => {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service'] // Örnek servis
+        });
+        // Sıradaki arabaya ata
+        if (nextCartIndex < cartCount) {
+          connectedCarts[nextCartIndex] = true;
+          cartListItems[nextCartIndex].classList.add('connected');
+          nextCartIndex++;
+        }
+        alert('BLE cihazına bağlandı: ' + device.name);
+      } catch (error) {
+        alert('BLE bağlantısı başarısız: ' + error);
+      }
+    });
+
+    // Takip edilen market arabaları listesini doldur
+    const cartListScroll = document.querySelector('.cart-list-scroll');
+    const cartCount = 50;
     const cartListItems = [];
-    carts.forEach(c => {
+    let connectedCarts = [];
+      for(let i=1; i<=cartCount; i++) {
+        const item = document.createElement('div');
+        item.className = 'cart-list-item';
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.justifyContent = 'space-between';
+        // Sol bağlantı ikonu (küçük daire)
+        const icon = document.createElement('span');
+        icon.className = 'cart-status-icon disconnected';
+        icon.title = 'Bağlı değil';
+        item.appendChild(icon);
+        // Metin
+        const label = document.createElement('span');
+        label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+        label.style.flex = '1';
+        label.style.marginLeft = '8px';
+        item.appendChild(label);
+        // Bağlı/bağlı değil görseli kaldırıldı. Sadece arka plan ve metin olacak.
+        // Zincir simgesi kaldırıldı.
+        item.dataset.cartIndex = i-1;
+        cartListScroll.appendChild(item);
+        cartListItems.push(item);
+      }
+
+    // Popup fonksiyonu
+    function showCartPopup(index) {
+      // Popup zaten varsa kaldır
+      const oldPopup = document.getElementById('cart-list-popup');
+      if (oldPopup) oldPopup.remove();
       const item = document.createElement('div');
       item.className = 'cart-list-item';
-      item.textContent = `Market Arabası ${c.id.toString().padStart(2,'0')}`;
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.justifyContent = 'center';
+      // Sadece metin
+      const label = document.createElement('span');
+      label.textContent = `Market Arabası ${i.toString().padStart(2, '0')}`;
+      label.style.flex = '1';
+      label.style.marginLeft = '8px';
+      item.appendChild(label);
+      item.dataset.cartIndex = i-1;
       cartListScroll.appendChild(item);
       cartListItems.push(item);
+    }
+
+    // Tıklanabilirlik
+    cartListItems.forEach((item, idx) => {
+      // Zincir ikonuna tıklama
+      const chain = item.querySelector('.cart-chain-icon');
+      chain.onclick = (e) => {
+        e.stopPropagation();
+        if (connectedCarts[idx]) {
+          showCartPopup(idx);
+        } else {
+          showDisconnectedWarning();
+        }
+      };
+      // Satırın tamamına tıklama
+      item.onclick = (e) => {
+        // Zincir ikonuna tıklanmadıysa
+        if (!chain.contains(e.target)) {
+          if (connectedCarts[idx]) {
+            showCartPopup(idx);
+          } else {
+            showDisconnectedWarning();
+          }
+        }
+      };
     });
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      const popup = document.createElement('div');
-      popup.className = 'popup-overlay';
-      popup.innerHTML = `<div class="popup-content">
-        <div>Çıkış yapmak istediğinize emin misiniz?</div>
-        <button class="btn-yes">Evet</button>
-        <button class="btn-no">Hayır</button>
-      </div>`;
-      document.body.appendChild(popup);
-      popup.querySelector('.btn-yes').onclick = () => window.location.href='giris.html';
-      popup.querySelector('.btn-no').onclick = () => popup.remove();
+    // BLE cihazı bağlandığında sıradaki arabaya ata
+    let nextCartIndex = 0;
+    connectedCarts = Array(cartCount).fill(false);
+    document.getElementById('connect-btn').addEventListener('click', async () => {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service']
+        });
+        // Sıradaki arabaya ata
+        if (nextCartIndex < cartCount) {
+          connectedCarts[nextCartIndex] = true;
+          cartListItems[nextCartIndex].classList.add('connected');
+          // Bağlantı ikonunu güncelle
+          const icon = cartListItems[nextCartIndex].querySelector('.cart-status-icon');
+          if (icon) {
+            icon.classList.remove('disconnected');
+            icon.classList.add('connected');
+            icon.title = 'Bağlı';
+          }
+          // Durum görselini güncelle
+          const statusImg = cartListItems[nextCartIndex].querySelector('img');
+          if (statusImg) {
+            statusImg.src = 'yesil.png';
+            statusImg.alt = 'Bağlı';
+          }
+          // Zincir ikonunu güncelle
+          const chain = cartListItems[nextCartIndex].querySelector('.cart-chain-icon');
+          if (chain) {
+            chain.classList.remove('disconnected');
+            chain.classList.add('connected');
+            chain.querySelectorAll('path').forEach(p => {
+              p.setAttribute('stroke', '#4caf50');
+            });
+          }
+          nextCartIndex++;
+        }
+        alert('BLE cihazına bağlandı: ' + device.name);
+      } catch (error) {
+        alert('BLE bağlantısı başarısız: ' + error);
+      }
     });
-  </script>
+    // Bağlantı durumu zincir ikonlarını başlat
+    cartListItems.forEach((item, idx) => {
+      const chain = item.querySelector('.cart-chain-icon');
+      if (chain) {
+        chain.classList.remove('connected');
+        chain.classList.add('disconnected');
+        chain.querySelectorAll('path').forEach(p => {
+          p.setAttribute('stroke', '#f44336');
+        });
+      }
+    });
+
+    // Bağlı değil uyarı popup'ı
+    function showDisconnectedWarning() {
+      const oldPopup = document.getElementById('cart-disconnected-popup');
+      if (oldPopup) oldPopup.remove();
+      const popup = document.createElement('div');
+      popup.id = 'cart-disconnected-popup';
+      popup.style.position = 'fixed';
+      popup.style.top = '0';
+      popup.style.left = '0';
+      popup.style.width = '100vw';
+      popup.style.height = '100vh';
+      popup.style.background = 'rgba(0,0,0,0.25)';
+      popup.style.display = 'flex';
+      popup.style.alignItems = 'center';
+      popup.style.justifyContent = 'center';
+      popup.style.zIndex = '9999';
+      const content = document.createElement('div');
+      content.style.background = '#fff';
+      content.style.padding = '2.2rem 2.5rem 1.5rem 2.5rem';
+      content.style.borderRadius = '16px';
+      content.style.boxShadow = '0 4px 32px rgba(0,0,0,0.13)';
+      content.style.display = 'flex';
+      content.style.flexDirection = 'column';
+      content.style.alignItems = 'center';
+      content.innerHTML = `<div style='font-size:1.15rem;color:#d32f2f;font-weight:600;margin-bottom:1.2rem;text-align:center;'>Makret Arabası Şu Anda Bağlı Değil<br>Bağlantıyı Kontrol Edip Tekrar Deneyin</div>`;
+      const btn = document.createElement('button');
+      btn.textContent = 'Tamam';
+      btn.style.background = '#ee7624';
+      btn.style.color = '#fff';
+      btn.style.fontWeight = 'bold';
+      btn.style.fontSize = '1.1rem';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '7px';
+      btn.style.padding = '0.7rem 2.5rem';
+      btn.style.cursor = 'pointer';
+      btn.style.marginTop = '0.5rem';
+      btn.onclick = () => popup.remove();
+      content.appendChild(btn);
+      popup.appendChild(content);
+      document.body.appendChild(popup);
+    }
+</script>
 </body>
 </html>
+<script>
+  // --- Yeni Simülasyon: Rastgele Dolaşan 1-10 Daire ---
+  const simCarts = [];
+  const simCartCount = 10;
+  let simRunning = false;
+
+  // Simülasyon için daireleri oluştur
+  for (let i = 1; i <= simCartCount; i++) {
+    const cartEl = document.createElement('div');
+    cartEl.classList.add('cart');
+    cartEl.style.width = '30px';
+    cartEl.style.height = '30px';
+    cartEl.style.borderRadius = '50%';
+    cartEl.style.backgroundColor = `hsl(${i*36}, 70%, 50%)`;
+    cartEl.style.position = 'absolute';
+    cartEl.style.left = `${Math.random() * (storeMap.offsetWidth - 30)}px`;
+    cartEl.style.top = `${Math.random() * (storeMap.offsetHeight - 30)}px`;
+    cartEl.textContent = i;
+    cartEl.style.fontSize = '14px';
+    cartEl.style.fontWeight = 'bold';
+    cartEl.style.display = 'flex';
+    cartEl.style.alignItems = 'center';
+    cartEl.style.justifyContent = 'center';
+    storeMap.appendChild(cartEl);
+    simCarts.push(cartEl);
+  }
+
+  // Takibi Aç/Kapa butonuna bağla
+  const simToggleBtn = document.getElementById('toggle-sim');
+  simToggleBtn.addEventListener('click', () => {
+    simRunning = !simRunning;
+  });
+
+  // Daireleri hareket ettir
+  function moveSimCarts() {
+    if (!simRunning) return;
+    simCarts.forEach(cart => {
+      let x = parseFloat(cart.style.left);
+      let y = parseFloat(cart.style.top);
+      x += Math.random() * 10 - 5;
+      y += Math.random() * 10 - 5;
+      x = Math.max(0, Math.min(storeMap.offsetWidth - 30, x));
+      y = Math.max(0, Math.min(storeMap.offsetHeight - 30, y));
+      cart.style.left = x + 'px';
+      cart.style.top = y + 'px';
+    });
+  }
+
+  setInterval(moveSimCarts, 500);
+</script>
